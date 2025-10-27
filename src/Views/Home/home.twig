@@ -1,1 +1,120 @@
-HOME
+<!DOCTYPE html>
+<html lang="pt-BR" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ SITE_NAME | default('Infraestrutura de Transmissão') }}</title>
+
+    {# Bootstrap #}
+    <link href="{{ ASSETS_URL }}/css/bootstrap.css" rel="stylesheet" />
+
+    {# CSS principal #}
+    <link href="{{ ASSETS_URL }}/css/principal.css" rel="stylesheet" />
+
+    {# CSS extra por página (opcional) #}
+    {% if css_extra is defined and css_extra %}
+        <link rel="stylesheet" href="{{ css_extra }}" />
+    {% endif %}
+</head>
+<body class="bg-body body-bg-limited">
+<!-- Header / Navbar -->
+<header class="sticky-top border-bottom shadow-sm bg-white">
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{{ principal_url | default('#') }}">
+                <img
+                        src="{{ ASSETS_URL }}/img/logo.jpeg"
+                        alt="Logo"
+                        height="70"
+                        class="me-1"
+                        onerror="this.style.display='none'"
+                />
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false"
+                    aria-label="Alternar navegação">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            {% set default_menu = [
+                {href: BASE_URL ~ '/home', label: 'Início'},
+                {href: BASE_URL ~ '/antena', label: 'Listar Antenas'},
+                {href: BASE_URL ~ '/antena/novo', label: 'Cadastrar Antenas'},
+            ] %}
+            {% set items = (menu_override is defined and menu_override) ? menu_override : default_menu %}
+
+            {# caminho atual pode vir do seu controller como current_path (ex.: request path) #}
+            {% set current = current_path is defined ? current_path : '' %}
+
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    {% for item in items %}
+                        {% set is_active = current and current == item.href %}
+                        <li class="nav-item">
+                            <a
+                                    class="nav-link {{ is_active ? 'active fw-semibold' : '' }}"
+                                    href="{{ item.href }}"
+                                    {% if item.target is defined %}target="{{ item.target }}"{% endif %}
+                                    aria-current="{{ is_active ? 'page' : '' }}"
+                            >{{ item.label }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<!-- Main / Hero -->
+<main class="main-full-top">
+    <section class="container py-5">
+        <div class="row align-items-start g-5">
+            <div class="col-12 col-lg-6">
+                <span class="badge text-bg-secondary mb-3">{{ SITE_NAME }}</span>
+                <h1 class="display-5 fw-bold mb-3 lh-sm color-1">
+                    Administração da estrutura de responsabilidade ANATEL
+                </h1>
+                <p class="lead text-muted mb-4">
+                    Acesso facilitado às principais funcionalidades do sistema.
+                </p>
+
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{{ BASE_URL }}/antena"
+                       class="btn btn-primary btn-lg px-4">
+                        Antenas
+                    </a>
+                    <a href="{{ BASE_URL }}/servicos"
+                       class="btn btn-outline-secondary btn-lg px-4">
+                        Ver mais
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+</main>
+
+<!-- Footer -->
+<footer
+        class="py-3 border-top fixed-bottom shadow-sm bg-white"
+        style="z-index: 1030;"
+>
+    <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between gap-2 small text-muted">
+        <div>
+            © {{ ano | default('2025') }} Infraestrutura de Transmissão. Todos os direitos reservados.
+        </div>
+        <ul class="nav small">
+            <li class="nav-item"><a class="nav-link link-secondary px-2" href="#">Termos</a></li>
+            <li class="nav-item"><a class="nav-link link-secondary px-2" href="#">Privacidade</a></li>
+            <li class="nav-item"><a class="nav-link link-secondary px-2" href="#">Contato</a></li>
+        </ul>
+    </div>
+</footer>
+
+<script src="{{ ASSETS_URL }}/js/bootstrap.bundle.min.js"></script>
+
+{# Slot para JS extra por página #}
+{% block scripts %}{% endblock %}
+</body>
+</html>

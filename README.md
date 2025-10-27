@@ -76,3 +76,9 @@
     	>> public / index.php
     	>> Controllers / Home / HomeController.php
     	>> Views / Home / home.twig
+    => Definir layout
+    	>> prototipando layout
+    => Implementando
+    	>> Views / Home / home.twig
+    	>> public / assets / css / principal.php
+    	>> src / config.php

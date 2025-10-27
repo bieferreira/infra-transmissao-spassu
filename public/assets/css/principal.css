@@ -1,0 +1,121 @@
+.color-1 {
+    color: #3664a9;
+}
+.color-2 {
+    color: #8b0000;
+}
+.color-3 {
+    color: #379c5f;
+}
+
+/* Suaviza interações visuais */
+.hover-raise {
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+.hover-raise:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.1);
+}
+
+/* Ajustes utilitários */
+.object-fit-cover { object-fit: cover; }
+
+/* Navbar active underline sutil */
+.navbar .nav-link.active {
+    position: relative;
+}
+.navbar .nav-link.active::after {
+    content: "";
+    position: absolute;
+    left: .5rem;
+    right: .5rem;
+    bottom: .2rem;
+    height: 2px;
+    background: currentColor;
+    opacity: .4;
+    border-radius: 2px;
+}
+
+/* Melhor legibilidade em modo claro */
+:root {
+    --bs-body-font-size: 1rem;
+}
+
+.main-full-top {
+    min-height: calc(100vh - 100px);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 4rem;
+    padding-bottom: 100px;
+}
+
+/* Caso queira centralizar horizontalmente o container dentro do main */
+.main-full-top > .container {
+    flex: 1 0 auto;
+}
+
+/* ====================================================
+   BACKGROUND CENTRALIZADO NO BODY (atrás de tudo)
+   ==================================================== */
+.body-bg-limited {
+    position: relative;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    overflow-x: hidden; /* evita scroll lateral */
+}
+
+/* camada da imagem — fica atrás de todo o conteúdo */
+.body-bg-limited::before {
+    content: "";
+    position: fixed;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-40%);
+    width: 1320px;
+    height: 100vh;
+
+    background-image: url('../img/home.png');
+    background-size: 60% !important;
+    background-repeat: no-repeat;
+    background-position: right center;
+    background-size: contain;
+
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Responsivo — ajusta conforme o container Bootstrap */
+@media (max-width: 1400px) {
+    .body-bg-limited::before { width: 1140px; }
+}
+@media (max-width: 1200px) {
+    .body-bg-limited::before { width: 960px; }
+}
+@media (max-width: 992px) {
+    .body-bg-limited::before {
+        width: 720px;
+        background-size: cover;
+        background-position: center top;
+    }
+}
+@media (max-width: 768px) {
+    .body-bg-limited::before { width: 540px; }
+}
+@media (max-width: 576px) {
+    .body-bg-limited::before { display: none; }
+}
+
+.toggle-caret {
+    transition: transform .2s ease;
+}
+.card-header [data-bs-toggle="collapse"][aria-expanded="false"] .toggle-caret {
+    transform: rotate(-90deg);
+}
+
+.card-header .btn-link {
+    text-decoration: none !important;
+}
+.card-header .btn-link:hover {
+    text-decoration: none !important;
+}
