@@ -82,3 +82,8 @@
     	>> Views / Home / home.twig
     	>> public / assets / css / principal.php
     	>> src / config.php
+    	>> Views / base.twig
+    	>> Views / Partials / header.twig
+    	>> Views / Partials / footer.twig
+    => Refatorando
+    	>> Views / Home / home.twig

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ SITE_NAME | default('Infraestrutura de Transmissão') }}</title>
+
+    {# Bootstrap #}
+    <link href="{{ ASSETS_URL }}/css/bootstrap.css" rel="stylesheet" />
+
+    {# CSS principal #}
+    <link href="{{ ASSETS_URL }}/css/principal.css" rel="stylesheet" />
+
+    {# CSS extra por página (opcional) #}
+    {% if css_extra is defined and css_extra %}
+        <link rel="stylesheet" href="{{ css_extra }}" />
+    {% endif %}
+</head>
+<body class="bg-body body-bg-limited">
+
+    {% include 'Partials/header.twig' %}
+
+        <main class="container my-4">
+            {% block content %}{% endblock %}
+        </main>
+
+    {% include 'Partials/footer.twig' %}
+
+<script src="{{ ASSETS_URL }}/js/bootstrap.bundle.min.js"></script>
+
+{# Slot para JS extra por página #}
+{% block scripts %}{% endblock %}
+</body>
+</html>
