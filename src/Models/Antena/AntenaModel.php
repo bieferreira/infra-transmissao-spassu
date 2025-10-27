@@ -3,6 +3,32 @@
 require_once __DIR__ . '/../../db.php';
 
 /**
+ * Lista top 5 antenas por estado
+ * Ex.: [['uf' => 'SP', 'total' => 1234], ...]
+ */
+function antena_top_ufs(int $limit = 5): array
+{
+    $pdo = db();
+    // Cast no $limit para evitar problemas com LIMIT parametrizado
+    $limit = max(1, (int)$limit);
+
+    $sql = "SELECT 
+        a.uf, 
+        e.uf_descricao, 
+        COUNT(*) AS total
+    FROM antenas AS a
+    INNER JOIN estados AS e ON e.uf = a.uf
+    GROUP BY a.uf, e.uf_descricao
+    ORDER BY total DESC
+    LIMIT {$limit};
+    ";
+
+
+    $stmt = $pdo->query($sql);
+    return $stmt->fetchAll();
+}
+
+/**
  * Lista antenas com paginação e filtros opcionais.
  * $options = [
  *   'page' => 1,

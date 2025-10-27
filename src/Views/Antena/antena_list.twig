@@ -11,7 +11,47 @@
             </a>
         </div>
 
-        <form method="get" class="row g-2 mb-3">
+        {# Ranking Top 5 UFs #}
+        <div class="card mt-5 mb-3">
+            <div class="card-header p-0">
+                <button class="btn btn-link w-100 text-start px-3 py-2 d-flex align-items-center color-3"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#rankingUfs"
+                        aria-expanded="true"
+                        aria-controls="rankingUfs">
+                    <strong>Estados com maior incidência de antenas</strong>
+                    <span class="ms-auto toggle-caret" aria-hidden="true">▼</span>
+                </button>
+            </div>
+
+            <div id="rankingUfs" class="collapse show">
+                <ul class="list-group list-group-flush">
+                    {% if ranking_ufs is empty %}
+                        <li class="list-group-item text-muted">Sem dados para exibir.</li>
+                    {% else %}
+                        {% for r in ranking_ufs %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <span class="badge bg-secondary me-2">{{ loop.index }}</span>
+                                    <strong class="ms-5">{{ r.uf }}</strong>
+                                    <span class="ms-5 text-muted">{{ r.uf_descricao }}</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-dark ms-5">{{ r.total }}</span>
+                                    <a class="btn btn-sm btn-outline-primary ms-5"
+                                       href="{{ BASE_URL }}/antena?uf={{ r.uf }}{% if q %}&q={{ q }}{% endif %}">
+                                        Listar
+                                    </a>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
+        <form method="get" class="row g-2 mt-5 mb-3">
             <div class="col-md-4">
                 <input type="text" name="q" value="{{ q|default('') }}" class="form-control" placeholder="Buscar descrição...">
             </div>

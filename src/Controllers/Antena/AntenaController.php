@@ -21,6 +21,7 @@ $options = [
     'uf'       => $uf,
 ];
 
+$ranking_ufs  = antena_top_ufs(5);
 $antenas = antena_list($options);
 
 $total   = antena_count($options);
@@ -35,6 +36,7 @@ try {
         'listar' => APP_TWIG->render('/Antena/antena_list.twig', [
             'titulo'        => 'Lista de Antenas',
             'principal_url' => 'home',
+            'ranking_ufs'  => $ranking_ufs,
             'antenas'  => $antenas,
             'page'     => $page,
             'total'    => $total,

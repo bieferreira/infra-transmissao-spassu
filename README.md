@@ -120,3 +120,6 @@
     => Implementando Model antena
 	    >> src / db.php
     	>> src / Model / Antena / AntenaModel.php
+	=> Implementando Antena
+		>> criar listar com model
+		>> criar ranking com model
