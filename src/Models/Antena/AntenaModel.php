@@ -128,8 +128,10 @@ function antena_count(array $options = []): int
 function antena_find(int $id): ?array
 {
     $pdo = db();
-    $stmt = $pdo->prepare('SELECT id_antena, descricao, latitude, longitude, uf, data_implantacao
-                           FROM antenas WHERE id_antena = :id LIMIT 1');
+    $stmt = $pdo->prepare('SELECT a.id_antena, a.descricao, a.latitude, a.longitude, a.uf, a.data_implantacao, a.foto_path, e.uf_descricao
+                        FROM antenas AS a
+                        INNER JOIN estados AS e ON e.uf = a.uf 
+                        WHERE id_antena = :id LIMIT 1');
     $stmt->bindValue(':id', $id, PDO::PARAM_INT);
     $stmt->execute();
 

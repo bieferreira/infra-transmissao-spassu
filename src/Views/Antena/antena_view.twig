@@ -4,29 +4,18 @@
 
 {% block styles %}
     {{ parent() }}
-    <link rel="stylesheet"
-          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-          crossorigin=""/>
-    <style>
-        /* Impede que regras globais de imagem afetem as tiles do Leaflet */
-        .leaflet-container img {
-            max-width: 0px !important;
-        }
-        .card-body.p-0 { overflow: hidden; }         /* corta qualquer sobra dentro do card */
-        .map-wrap { height: 420px; width: 100%; }    /* altura fixa confiável */
-        #map { height: 100%; width: 100%; display: block; }
-        .leaflet-container {
-            overflow: hidden;
-            border-top-left-radius: .5rem;
-            border-top-right-radius: .5rem;
-        }
+    <link
+            rel="stylesheet"
+            href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+            integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+            crossorigin=""
+    />
 
-        /* Seu restante */
-        .meta-label { width: 180px; }
-        .thumb-fit { object-fit: cover; max-height: 420px; width: 100%; }
-        .copyable { cursor: pointer; }
-        .card-full { width: 100%; }
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
     </style>
 {% endblock %}
 
@@ -36,16 +25,13 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
                 <h2 class="mb-0 color-1">{{ titulo | default('Ver Antena') }}</h2>
-                <small class="text-muted">
-                    {{ antena.uf }}{% if antena.uf_descricao %} — {{ antena.uf_descricao }}{% endif %}
-                </small>
             </div>
 
             <div class="d-flex gap-2">
-                <a href="{{ BASE_URL }}/antena/editar/{{ antena.id }}" class="btn btn-outline-warning">
+                <a href="{{ BASE_URL }}/antena/editar/{{ antena.id_antena }}" class="btn btn-outline-warning">
                     <i class="bi bi-pencil-square"></i> Editar
                 </a>
-                <a href="{{ BASE_URL }}/antena/excluir/{{ antena.id }}"
+                <a href="{{ BASE_URL }}/antena/excluir/{{ antena.id_antena }}"
                    class="btn btn-outline-danger"
                    onclick="return confirm('Deseja realmente excluir esta antena?')">
                     <i class="bi bi-trash"></i> Excluir
@@ -57,8 +43,8 @@
         </div>
 
         {# 1) DETALHES ACIMA (100% largura) #}
-        <div class="card card-full mb-3">
-            <div class="card-header">
+        <div class="card card-full mt-5 mb-3">
+            <div class="card-header color-3">
                 <strong>Detalhes da Antena</strong>
             </div>
             <div class="card-body">
@@ -70,11 +56,6 @@
                     <dd class="col-sm-8 col-md-9">
                         {{ antena.uf }}{% if antena.uf_descricao %} — {{ antena.uf_descricao }}{% endif %}
                     </dd>
-
-                    {% if antena.uf_descricao %}
-                        <dt class="col-sm-4 col-md-3 meta-label">Município</dt>
-                        <dd class="col-sm-8 col-md-9">{{ antena.uf_descricao }}</dd>
-                    {% endif %}
 
                     {% if antena.endereco %}
                         <dt class="col-sm-4 col-md-3 meta-label">Endereço</dt>
@@ -111,14 +92,27 @@
         </div>
 
         {# 2) MAPA (100% largura) #}
-        <div class="card card-full mb-3">
-            <div class="card-header">
-                <strong>Mapa</strong>
+        <div class="card mt-5 mb-3">
+            <div class="card-header p-0">
+                <button class="btn btn-link w-100 text-start px-3 py-2 d-flex align-items-center color-3"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#mapaantena"
+                        aria-expanded="true"
+                        aria-controls="mapaantena">
+                    <strong>Mapa</strong>
+                    <span class="ms-auto toggle-caret" aria-hidden="true">▼</span>
+                </button>
             </div>
+            <div id="mapaantena" class="collapse hidden">
             <div class="card-body p-0">
-                <div class="map-wrap">
-                    <div id="map"></div>
-                </div>
+                <iframe
+                        id="iframeAntenaMapa"
+                        name="iframeAntenaMapa"
+                        src="{{ BASE_URL }}/antena/mapa/{{ antena.id_antena }}"
+                        class="w-100 border rounded"
+                        style="height: 520px;">
+                </iframe>
             </div>
             <div class="card-footer d-flex flex-wrap gap-2">
                 <a class="btn btn-sm btn-outline-primary"
@@ -132,25 +126,34 @@
                     Abrir no OSM
                 </a>
             </div>
+            </div>
         </div>
 
         {# 3) IMAGEM (100% largura) #}
-        <div class="card card-full">
-            <div class="card-header">
-                <strong>Imagem</strong>
+        <div class="card mt-5 mb-3">
+            <div class="card-header p-0">
+                <button class="btn btn-link w-100 text-start px-3 py-2 d-flex align-items-center color-3"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#fotoantena"
+                        aria-expanded="true"
+                        aria-controls="fotoantena">
+                    <strong>Foto</strong>
+                    <span class="ms-auto toggle-caret" aria-hidden="true">▼</span>
+                </button>
             </div>
-            <div class="card-body p-2">
-                {% set img_src = antena.foto_url | default(ASSETS_URL ~ '/img/placeholder-antenna.jpg') %}
-                <img src="{{ img_src }}" alt="Foto da antena" class="img-fluid rounded thumb-fit">
-                {% if not antena.foto_url %}
-                    <p class="text-muted small mt-2 mb-0">
-                        * Sem imagem enviada. Mostrando placeholder.
-                    </p>
-                {% endif %}
+            <div id="fotoantena" class="collapse hidden">
+                <div class="card-body p-2">
+                    {% if antena.foto_path is not empty %}
+                        <img src="{{ antena.foto_path }}" alt="Foto da antena" class="img-fluid rounded thumb-fit">
+                    {% else %}
+                        <p class="text-muted small">Sem foto disponível</p>
+                    {% endif %}
+                </div>
             </div>
-        </div>
 
     </div>
+    <br><br>
 {% endblock %}
 
 {% block scripts %}
@@ -159,49 +162,23 @@
             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
             crossorigin=""></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const lat = Number('{{ antena.latitude|default(0) }}');
-            const lng = Number('{{ antena.longitude|default(0) }}');
-            if (!lat || !lng) return;
+        // Definir coordenadas (Campo Grande - MS, por exemplo)
+        const latitude = -20.4697;
+        const longitude = -54.6201;
 
-            const mapElement = document.getElementById('map');
-            if (!mapElement) return;
+        // Inicializar o mapa
+        const map = L.map('map').setView([latitude, longitude], 13);
 
-            // Garante que o mapa tenha tamanho válido
-            mapElement.style.height = '420px';
-            mapElement.style.width = '100%';
+        // Adicionar o mapa base (OpenStreetMap)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
 
-            const map = L.map('map').setView([lat, lng], 16);
+        // Adicionar marcador
+        const marker = L.marker([latitude, longitude]).addTo(map);
 
-            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; OpenStreetMap'
-            }).addTo(map);
-
-            const popup = `
-        <strong>{{ antena.descricao|e }}</strong><br>
-        {{ antena.uf }}{% if antena.uf_descricao %} — {{ antena.uf_descricao|e }}{% endif %}<br>
-        <small>${lat}, ${lng}</small>
-    `;
-            L.marker([lat, lng]).addTo(map).bindPopup(popup).openPopup();
-
-            // 🔧 Corrige bug visual forçando recálculo duas vezes
-            setTimeout(() => {
-                map.invalidateSize();
-                setTimeout(() => map.invalidateSize(), 500);
-            }, 300);
-
-            // Copiar coordenadas
-            document.querySelectorAll('.copyable').forEach(el => {
-                el.addEventListener('click', () => {
-                    const val = el.dataset.copy || el.textContent.trim();
-                    navigator.clipboard.writeText(val).then(() => {
-                        const old = el.textContent;
-                        el.textContent = 'Copiado!';
-                        setTimeout(() => el.textContent = old, 900);
-                    });
-                });
-            });
-        });
+        // Popup opcional
+        marker.bindPopup('<b>Campo Grande - MS</b><br>Latitude: ' + latitude + '<br>Longitude: ' + longitude).openPopup();
     </script>
 {% endblock %}

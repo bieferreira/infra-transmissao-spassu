@@ -30,7 +30,7 @@ $options = [
 $total   = antena_count($options);
 $pages   = (int)ceil($total / 10);
 
-$allowed = '/^(cadastrar|editar|excluir|listar|ver)$/';
+$allowed = '/^(cadastrar|editar|excluir|listar|ver|mapa)$/';
 
 try {
     $action = preg_match($allowed, $uri_rota, $match) ? $match[0] : '';
@@ -62,7 +62,18 @@ try {
                 'antena'       => $antena,
                 ]);
         })(),
-        'cadastrar' => APP_TWIG->render('/Antena/antena_form.twig', [
+        'mapa' => (function () use ($id_antena) {
+            $id_antena  = (int)$id_antena;
+            $antena = antena_find($id_antena);
+
+            return APP_TWIG->render('/Antena/mapa.twig', [
+                'titulo'        => 'Ver Antena',
+                'principal_url' => 'home',
+                'latitude'       => '-20.4698',
+                'antena'       => $antena,
+            ]);
+        })(),
+        'cadastrar1' => APP_TWIG->render('/Antena/antena_form.twig', [
             'titulo'        => 'Nova Antena',
             'principal_url' => 'home',
         ]),
