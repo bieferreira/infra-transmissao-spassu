@@ -10,3 +10,5 @@ $twig = new \Twig\Environment($loader, [
     'cache' => false,
     'debug' => true,
 ]);
+
+return $twig;

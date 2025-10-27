@@ -61,3 +61,18 @@
     	>> Bootstrap
     		=>> composer require twbs/bootstrap
     		=>> mover arquivos vendor/twbs/bootstrap/dist/ -> assets
+
+6 Implementação
+
+    => Definindo estrutura
+    	>> src / config.php
+    	>> src / Controllers
+    	>> src / Core
+    	>> src / Models
+    	>> src / Views
+        >> public / index.php
+    => Implementando 
+    	>> src / config.php
+    	>> public / index.php
+    	>> Controllers / Home / HomeController.php
+    	>> Views / Home / home.twig
