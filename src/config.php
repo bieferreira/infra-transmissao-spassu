@@ -16,6 +16,11 @@ const ASSETS_URL = BASE_URL . '/assets';
 const SITE_NAME  = 'Infraestrutura de Trânsmissão';
 
 define('APP_TWIG', $twig);
+const DB_HOST = 'InfraTransmissaoSpassuMysql';
+const DB_PORT = '3306';
+const DB_NAME = 'infratransmissao';
+const DB_USER = 'user';
+const DB_PASS = '1nfr4Sp4ssu';
 
 $globals = [
     'BASE_URL'   => BASE_URL,

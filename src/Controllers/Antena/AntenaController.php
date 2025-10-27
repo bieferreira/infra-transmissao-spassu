@@ -7,7 +7,24 @@ $uri = explode('/', $uri);
 $uri = $uri[2] ?? '';
 $uri = $uri !== '' ? $uri : 'listar';
 
-$antenas = [];
+require_once __DIR__ . '/../../Models/Antena/AntenaModel.php';
+
+// parâmetros consulta
+$page    = isset($_GET['page']) && (int)$_GET['page'] > 0 ? (int)$_GET['page'] : 1;
+$search  = isset($_GET['q']) ? (string)$_GET['q'] : '';
+$uf      = isset($_GET['uf']) ? (string)$_GET['uf'] : '';
+
+$options = [
+    'page'     => $page,
+    'per_page' => 10,
+    'search'   => $search,
+    'uf'       => $uf,
+];
+
+$antenas = antena_list($options);
+
+$total   = antena_count($options);
+$pages   = (int)ceil($total / 10);
 
 $allowed = '/^(cadastrar|editar|excluir|listar|ver)$/';
 
@@ -18,7 +35,12 @@ try {
         'listar' => APP_TWIG->render('/Antena/antena_list.twig', [
             'titulo'        => 'Lista de Antenas',
             'principal_url' => 'home',
-            'antenas'       => $antenas,
+            'antenas'  => $antenas,
+            'page'     => $page,
+            'total'    => $total,
+            'pages'    => $pages,
+            'q'        => $search,
+            'uf'       => $uf,
         ]),
         'ver' => APP_TWIG->render('/Antena/antena_list.twig', [
             'titulo'        => 'Lista de Antenas',

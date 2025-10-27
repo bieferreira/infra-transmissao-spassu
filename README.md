@@ -117,3 +117,6 @@
     	>> src / Core / request.php
     	>> src / Controllers / 404 / 404Controler.php
     	>> src / Views / 404 / 404.twig
+    => Implementando Model antena
+	    >> src / db.php
+    	>> src / Model / Antena / AntenaModel.php

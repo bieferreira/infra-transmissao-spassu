@@ -69,12 +69,11 @@
 .body-bg-limited::before {
     content: "";
     position: fixed;
-    top: 40px;
+    top: 25px;
     left: 50%;
     transform: translateX(-40%);
     width: 1320px;
     height: 100vh;
-
     background-image: url('../img/home.png');
     background-size: 60% !important;
     background-repeat: no-repeat;
