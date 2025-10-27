@@ -11,9 +11,11 @@ $twig = new \Twig\Environment($loader, [
     'debug' => true,
 ]);
 
-const BASE_URL = '';
+const BASE_URL   = '';
 const ASSETS_URL = BASE_URL . '/assets';
 const SITE_NAME  = 'Infraestrutura de Trânsmissão';
+
+define('APP_TWIG', $twig);
 
 $globals = [
     'BASE_URL'   => BASE_URL,
@@ -25,4 +27,4 @@ foreach ($globals as $key => $value) {
     $twig->addGlobal($key, $value);
 }
 
-return $twig;
+//return $twig;

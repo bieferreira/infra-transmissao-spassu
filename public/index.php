@@ -2,18 +2,20 @@
 
 declare(strict_types=1);
 
-$uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
-$uri = $uri ? $uri : '/';
-$uri = rtrim($uri, '/') ? rtrim($uri, '/') : '/';
+require_once __DIR__ . '/../src/config.php';
 
-switch ($uri) {
-    case '/':
-    case '/home':
-        require __DIR__ . '/../src/Controllers/Home/HomeController.php';
-        break;
+$uri = (require __DIR__ . '/../src/Core/request.php')();
+$uri = explode('/', $uri);
+$uri = $uri[1] ?? '';
+$uri = $uri !== '' ? $uri : 'home';
 
-    default:
-        http_response_code(404);
-        echo 'Not found';
-        break;
+$routes = [
+    'home'   => '/../src/Controllers/Home/HomeController.php',
+    'antena' => '/../src/Controllers/Antena/AntenaController.php',
+];
+
+if (isset($routes[$uri])) {
+    require __DIR__ . $routes[$uri];
+} else {
+    require __DIR__ . '/../src/Controllers/404/404Controller.php';
 }

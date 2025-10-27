@@ -10,7 +10,7 @@
 
 4 Ajuste logo e imports font
 
-6 Configuração ambiente
+5 Configuração ambiente
 
     => Criar repositorio github
     => Iniciar git
@@ -110,3 +110,10 @@
 		>> Criar carga dados
 			=>> migrate-init-data > vendor/bin/phinx seed:create AntenasSeeder
     		=>> migrate-load-data > vendor/bin/phinx seed:run -s AntenasSeeder
+    => Definir layout
+    	>> criar list
+    => Refatorando rotas
+    => Implementando
+    	>> src / Core / request.php
+    	>> src / Controllers / 404 / 404Controler.php
+    	>> src / Views / 404 / 404.twig
