@@ -9,7 +9,12 @@
     "test": "./vendor/bin/phpunit",
     "lint": "vendor/bin/php-cs-fixer fix --dry-run --diff",
     "format": "vendor/bin/php-cs-fixer fix",
-    "insights": "php vendor/bin/phpinsights -n"
+    "insights": "php vendor/bin/phpinsights -n",
+    "migrate-init": "vendor/bin/phinx create InitInfraSpassu",
+    "migrate": "vendor/bin/phinx migrate",
+    "migrate-back": "vendor/bin/phinx rollback -t 0",
+    "migrate-init-data": "vendor/bin/phinx seed:create AntenasSeeder",
+    "migrate-load-data": "vendor/bin/phinx seed:run -s AntenasSeeder"
   },
   "config": {
     "allow-plugins": {

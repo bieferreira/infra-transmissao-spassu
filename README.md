@@ -87,3 +87,26 @@
     	>> Views / Partials / footer.twig
     => Refatorando
     	>> Views / Home / home.twig
+    => Refatorar docker compose
+    	>> docker compose down
+    	>> docker compose up -d --build
+    => Criar migrations
+    	>> Gerar o arquivo de configuração do Phinx.
+    		=>> vendor/bin/phinx init
+		>> Configurar a conexão com o banco de dados MySQL.
+			=>> criar phinx-db-constants.php
+		>> Criar a estrutura de diretórios para as migrações.
+			=>> db / migrations
+			=>> db / seeds
+		>> Gerar migrations
+			=>> composer migrate-init >> vendor/bin/phinx create vendor/bin/phinx migrateInitInfraSpassu
+			=>> Estrutura do projeto
+				>>> antenas
+				>>> usuarios
+				>>> estados
+				>>> carga antenas 100k
+				>>> carga estados
+			=>> composer migrate >> vendor/bin/phinx migrate
+		>> Criar carga dados
+			=>> migrate-init-data > vendor/bin/phinx seed:create AntenasSeeder
+    		=>> migrate-load-data > vendor/bin/phinx seed:run -s AntenasSeeder

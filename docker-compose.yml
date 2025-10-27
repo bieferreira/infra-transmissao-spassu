@@ -22,7 +22,7 @@ services:
       MYSQL_PASSWORD: 1nfr4Sp4ssu
       MYSQL_PORT: 3308
     volumes:
-      - ../data/mysql/:/var/lib/mysql
+      - ../data_transmissao/mysql/:/var/lib/mysql
     restart: always
     ports:
       - "3308:3306"
