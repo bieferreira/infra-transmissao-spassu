@@ -11,6 +11,7 @@
 4 Ajuste logo e imports font
 
 6 Configuração ambiente
+
     => Criar repositorio github
     => Iniciar git
         >> git init
@@ -30,4 +31,5 @@
         >> docker network create infratransmissaonetwork
         >> docker compose up -d --build
             =>> teste sucesso navegador
+    => Definindo token git
     
