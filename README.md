@@ -32,4 +32,32 @@
         >> docker compose up -d --build
             =>> teste sucesso navegador
     => Definindo token git
-    
+        >> configurando phpstorm
+    => Instalar dependencias
+    	>> Migrations phinx
+    		=>> composer require robmorgan/phinx --dev
+    	>> Testes unitários
+    		=>> sudo apt-get update
+				sudo apt-get install php8.3-xml
+				php -m | grep -E 'dom|xml'
+    		=>> composer require --dev phpunit/phpunit:^10.5 -W
+    		=>> criar phpunit.xml
+    		=>> criar tests / ExampleTest.php
+    		=>> composer test > ./vendor/bin/phpunit
+                >>> teste exemplo com sucesso
+    	>> Corretor PSR-12
+    		=>> criar .php-cs-fixer.dist.php
+    		=>> scripts composer.json
+    			>>> lint vericar padrao
+    			>>> format corrigir para o padrao
+    	>> Análise qualidade
+    		=>> composer require nunomaduro/phpinsights --dev
+    		=>> criar phpinsights.php
+    		=>> scripts composer.json
+    			>>> insights analisar padrao
+    	>> Twig
+    		=>> composer require "twig/twig:^3.0"
+    		=>> criar src / config.php
+    	>> Bootstrap
+    		=>> composer require twbs/bootstrap
+    		=>> mover arquivos vendor/twbs/bootstrap/dist/ -> assets

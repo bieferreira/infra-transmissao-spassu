@@ -1,3 +1,5 @@
 <?php
 
-echo "estrutura inicial";
+declare(strict_types=1);
+
+echo 'estrutura inicial';

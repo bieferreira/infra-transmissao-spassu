@@ -1,2 +1,23 @@
 {
+  "require-dev": {
+    "phpunit/phpunit": "^10.5",
+    "robmorgan/phinx": "^0.16.10",
+    "friendsofphp/php-cs-fixer": "^3.89",
+    "nunomaduro/phpinsights": "^2.12"
+  },
+  "scripts": {
+    "test": "./vendor/bin/phpunit",
+    "lint": "vendor/bin/php-cs-fixer fix --dry-run --diff",
+    "format": "vendor/bin/php-cs-fixer fix",
+    "insights": "php vendor/bin/phpinsights -n"
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  },
+  "require": {
+    "twig/twig": "^3.0",
+    "twbs/bootstrap": "^5.3"
+  }
 }
