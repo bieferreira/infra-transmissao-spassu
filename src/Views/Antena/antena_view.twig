@@ -1,0 +1,207 @@
+{% extends "base.twig" %}
+
+{% block title %}{{ titulo | default('Ver Antena') }}{% endblock %}
+
+{% block styles %}
+    {{ parent() }}
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin=""/>
+    <style>
+        /* Impede que regras globais de imagem afetem as tiles do Leaflet */
+        .leaflet-container img {
+            max-width: 0px !important;
+        }
+        .card-body.p-0 { overflow: hidden; }         /* corta qualquer sobra dentro do card */
+        .map-wrap { height: 420px; width: 100%; }    /* altura fixa confiável */
+        #map { height: 100%; width: 100%; display: block; }
+        .leaflet-container {
+            overflow: hidden;
+            border-top-left-radius: .5rem;
+            border-top-right-radius: .5rem;
+        }
+
+        /* Seu restante */
+        .meta-label { width: 180px; }
+        .thumb-fit { object-fit: cover; max-height: 420px; width: 100%; }
+        .copyable { cursor: pointer; }
+        .card-full { width: 100%; }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container py-4 bg-white">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h2 class="mb-0 color-1">{{ titulo | default('Ver Antena') }}</h2>
+                <small class="text-muted">
+                    {{ antena.uf }}{% if antena.uf_descricao %} — {{ antena.uf_descricao }}{% endif %}
+                </small>
+            </div>
+
+            <div class="d-flex gap-2">
+                <a href="{{ BASE_URL }}/antena/editar/{{ antena.id }}" class="btn btn-outline-warning">
+                    <i class="bi bi-pencil-square"></i> Editar
+                </a>
+                <a href="{{ BASE_URL }}/antena/excluir/{{ antena.id }}"
+                   class="btn btn-outline-danger"
+                   onclick="return confirm('Deseja realmente excluir esta antena?')">
+                    <i class="bi bi-trash"></i> Excluir
+                </a>
+                <a href="{{ BASE_URL }}/antena" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+            </div>
+        </div>
+
+        {# 1) DETALHES ACIMA (100% largura) #}
+        <div class="card card-full mb-3">
+            <div class="card-header">
+                <strong>Detalhes da Antena</strong>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 col-md-3 meta-label">Descrição</dt>
+                    <dd class="col-sm-8 col-md-9">{{ antena.descricao }}</dd>
+
+                    <dt class="col-sm-4 col-md-3 meta-label">UF</dt>
+                    <dd class="col-sm-8 col-md-9">
+                        {{ antena.uf }}{% if antena.uf_descricao %} — {{ antena.uf_descricao }}{% endif %}
+                    </dd>
+
+                    {% if antena.uf_descricao %}
+                        <dt class="col-sm-4 col-md-3 meta-label">Município</dt>
+                        <dd class="col-sm-8 col-md-9">{{ antena.uf_descricao }}</dd>
+                    {% endif %}
+
+                    {% if antena.endereco %}
+                        <dt class="col-sm-4 col-md-3 meta-label">Endereço</dt>
+                        <dd class="col-sm-8 col-md-9">{{ antena.endereco }}</dd>
+                    {% endif %}
+
+                    <dt class="col-sm-4 col-md-3 meta-label">Latitude</dt>
+                    <dd class="col-sm-8 col-md-9 copyable" data-copy="{{ antena.latitude }}">{{ antena.latitude }}</dd>
+
+                    <dt class="col-sm-4 col-md-3 meta-label">Longitude</dt>
+                    <dd class="col-sm-8 col-md-9 copyable" data-copy="{{ antena.longitude }}">{{ antena.longitude }}</dd>
+
+                    {% set implantacao = antena.data_implantacao | default(antena.data_impantacao) %}
+                    {% if implantacao %}
+                        <dt class="col-sm-4 col-md-3 meta-label">Implantação</dt>
+                        <dd class="col-sm-8 col-md-9">{{ implantacao | date('d/m/Y H:i') }}</dd>
+                    {% endif %}
+
+                    {% if antena.status %}
+                        <dt class="col-sm-4 col-md-3 meta-label">Status</dt>
+                        <dd class="col-sm-8 col-md-9">
+                        <span class="badge {{ antena.status in ['ATIVA','ATIVO'] ? 'bg-success' : 'bg-secondary' }}">
+                            {{ antena.status }}
+                        </span>
+                        </dd>
+                    {% endif %}
+
+                    {% if antena.observacao %}
+                        <dt class="col-sm-4 col-md-3 meta-label">Observações</dt>
+                        <dd class="col-sm-8 col-md-9">{{ antena.observacao }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+
+        {# 2) MAPA (100% largura) #}
+        <div class="card card-full mb-3">
+            <div class="card-header">
+                <strong>Mapa</strong>
+            </div>
+            <div class="card-body p-0">
+                <div class="map-wrap">
+                    <div id="map"></div>
+                </div>
+            </div>
+            <div class="card-footer d-flex flex-wrap gap-2">
+                <a class="btn btn-sm btn-outline-primary"
+                   href="https://www.google.com/maps/search/?api=1&query={{ antena.latitude }},{{ antena.longitude }}"
+                   target="_blank" rel="noopener">
+                    Abrir no Google Maps
+                </a>
+                <a class="btn btn-sm btn-outline-secondary"
+                   href="https://www.openstreetmap.org/?mlat={{ antena.latitude }}&mlon={{ antena.longitude }}#map=18/{{ antena.latitude }}/{{ antena.longitude }}"
+                   target="_blank" rel="noopener">
+                    Abrir no OSM
+                </a>
+            </div>
+        </div>
+
+        {# 3) IMAGEM (100% largura) #}
+        <div class="card card-full">
+            <div class="card-header">
+                <strong>Imagem</strong>
+            </div>
+            <div class="card-body p-2">
+                {% set img_src = antena.foto_url | default(ASSETS_URL ~ '/img/placeholder-antenna.jpg') %}
+                <img src="{{ img_src }}" alt="Foto da antena" class="img-fluid rounded thumb-fit">
+                {% if not antena.foto_url %}
+                    <p class="text-muted small mt-2 mb-0">
+                        * Sem imagem enviada. Mostrando placeholder.
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ parent() }}
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const lat = Number('{{ antena.latitude|default(0) }}');
+            const lng = Number('{{ antena.longitude|default(0) }}');
+            if (!lat || !lng) return;
+
+            const mapElement = document.getElementById('map');
+            if (!mapElement) return;
+
+            // Garante que o mapa tenha tamanho válido
+            mapElement.style.height = '420px';
+            mapElement.style.width = '100%';
+
+            const map = L.map('map').setView([lat, lng], 16);
+
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(map);
+
+            const popup = `
+        <strong>{{ antena.descricao|e }}</strong><br>
+        {{ antena.uf }}{% if antena.uf_descricao %} — {{ antena.uf_descricao|e }}{% endif %}<br>
+        <small>${lat}, ${lng}</small>
+    `;
+            L.marker([lat, lng]).addTo(map).bindPopup(popup).openPopup();
+
+            // 🔧 Corrige bug visual forçando recálculo duas vezes
+            setTimeout(() => {
+                map.invalidateSize();
+                setTimeout(() => map.invalidateSize(), 500);
+            }, 300);
+
+            // Copiar coordenadas
+            document.querySelectorAll('.copyable').forEach(el => {
+                el.addEventListener('click', () => {
+                    const val = el.dataset.copy || el.textContent.trim();
+                    navigator.clipboard.writeText(val).then(() => {
+                        const old = el.textContent;
+                        el.textContent = 'Copiado!';
+                        setTimeout(() => el.textContent = old, 900);
+                    });
+                });
+            });
+        });
+    </script>
+{% endblock %}

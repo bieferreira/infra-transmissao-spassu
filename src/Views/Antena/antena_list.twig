@@ -95,9 +95,9 @@
                             <td>{{ a.uf }}</td>
                             <td>{{ a.data_impantacao|date('d/m/Y H:i') }}</td>
                             <td class="text-center">
-                                <a href="{{ BASE_URL }}/antena/mostrar/{{ a.id }}" class="btn btn-sm btn-outline-info ms-3">Ver</a>
-                                <a href="{{ BASE_URL }}/antena/editar/{{ a.id }}" class="btn btn-sm btn-outline-warning ms-3">Editar</a>
-                                <a href="{{ BASE_URL }}/antena/excluir/{{ a.id }}" class="btn btn-sm btn-outline-danger ms-3" onclick="return confirm('Deseja realmente excluir esta antena?')">Excluir</a>
+                                <a href="{{ BASE_URL }}/antena/ver/{{ a.id_antena }}" class="btn btn-sm btn-outline-info ms-3">Ver</a>
+                                <a href="{{ BASE_URL }}/antena/editar/{{ a.id_antena }}" class="btn btn-sm btn-outline-warning ms-3">Editar</a>
+                                <a href="{{ BASE_URL }}/antena/excluir/{{ a.id_antena }}" class="btn btn-sm btn-outline-danger ms-3" onclick="return confirm('Deseja realmente excluir esta antena?')">Excluir</a>
                             </td>
                         </tr>
                     {% endfor %}
