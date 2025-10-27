@@ -1,0 +1,222 @@
+{% extends "base.twig" %}
+
+{% block title %}{{ titulo | default('Cadastrar Antena') }}{% endblock %}
+
+{% block styles %}
+    {{ parent() }}
+    <style>
+        .meta-label { width: 180px; }
+        .card-full { width: 100%; }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container py-4 bg-white">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h2 class="mb-0 color-1">{{ titulo | default(antena.id_antena ? 'Editar Antena' : 'Cadastrar Antena') }}</h2>
+                {% if antena.id_antena %}
+                    <small class="text-muted">ID: {{ antena.id_antena }}</small>
+                {% endif %}
+            </div>
+
+            <div class="d-flex gap-2">
+                {% if antena.id_antena %}
+                    <a href="{{ BASE_URL }}/antena/mostrar/{{ antena.id_antena }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-eye"></i> Ver
+                    </a>
+                {% endif %}
+                <a href="{{ BASE_URL }}/antena" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+            </div>
+        </div>
+
+        {# ALERTAS DE ERRO / SUCESSO (opcional) #}
+        {% if flash_success %}
+            <div class="alert alert-success">{{ flash_success }}</div>
+        {% endif %}
+        {% if flash_error %}
+            <div class="alert alert-danger">{{ flash_error }}</div>
+        {% endif %}
+        {% if errors is defined and errors %}
+            <div class="alert alert-danger mb-3">
+                <strong>Corrija os campos abaixo:</strong>
+                <ul class="mb-0">
+                    {% for e in errors %}
+                        <li>{{ e }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <form
+                action="{{ BASE_URL }}/antena/{{ antena.id_antena ? 'atualizar/' ~ antena.id_antena : 'salvar' }}"
+                method="post"
+                enctype="multipart/form-data"
+                class="needs-validation"
+                novalidate
+        >
+            {# CSRF opcional #}
+            {% if csrf is defined %}
+                <input type="hidden" name="_csrf" value="{{ csrf }}">
+            {% endif %}
+
+            {# 1) DADOS PRINCIPAIS #}
+            <div class="card card-full mt-5 mb-3">
+                <div class="card-header color-3"><strong>Dados da Antena</strong></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Descrição <span class="text-danger">*</span></label>
+                            <input type="text" name="descricao" class="form-control" required
+                                   value="{{ old.descricao | default(antena.descricao) }}">
+                            <div class="invalid-feedback">Informe a descrição.</div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">UF <span class="text-danger">*</span></label>
+                            {% if ufs is defined and ufs %}
+                                <select name="uf" class="form-select" required>
+                                    <option value="">Selecione...</option>
+                                    {% for uf in ufs %}
+                                        {% set uf_sigla = uf.uf is defined ? uf.uf : uf %}
+                                        <option value="{{ uf_sigla }}"
+                                                {{ (old.uf | default(antena.uf)) == uf_sigla ? 'selected' : '' }}>
+                                            {{ uf_sigla }}{% if uf.uf_descricao is defined %} — {{ uf.uf_descricao }}{% endif %}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            {% else %}
+                                <input type="text" name="uf" maxlength="2" class="form-control text-uppercase" placeholder="EX: MS" required
+                                       value="{{ old.uf | default(antena.uf) }}">
+                            {% endif %}
+                            <div class="invalid-feedback">Informe a UF.</div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+                            <label class="form-label">Altura</label>
+                            <input type="text" name="altura" class="form-control"
+                                   value="{{ old.altura | default(antena.altura) }}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Data de Implantação</label>
+                                {% set impl = old.data_implantacao
+                                | default(antena.data_implantacao
+                                ? antena.data_implantacao|date('Y-m-d') : '') %}
+                            <input type="date" name="data_implantacao" class="form-control" value="{{ impl }}">
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            {# 2) COORDENADAS (sem mapa) #}
+            <div class="card mt-3 mb-3">
+                <div class="card-header p-0">
+                    <button class="btn btn-link w-100 text-start px-3 py-2 d-flex align-items-center color-3"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#coords"
+                            aria-expanded="true"
+                            aria-controls="coords">
+                        <strong>Coordenadas</strong>
+                        <span class="ms-auto toggle-caret" aria-hidden="true">▼</span>
+                    </button>
+                </div>
+                <div id="coords" class="collapse show">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Latitude <span class="text-danger">*</span></label>
+                                <input type="number" name="latitude" class="form-control" required
+                                       step="0.0000001" min="-90" max="90"
+                                       placeholder="-20.469700"
+                                       value="{{ old.latitude | default(antena.latitude) }}">
+                                <div class="invalid-feedback">Informe uma latitude válida (entre -90 e 90).</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Longitude <span class="text-danger">*</span></label>
+                                <input type="number" name="longitude" class="form-control" required
+                                       step="0.0000001" min="-180" max="180"
+                                       placeholder="-54.620100"
+                                       value="{{ old.longitude | default(antena.longitude) }}">
+                                <div class="invalid-feedback">Informe uma longitude válida (entre -180 e 180).</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# 3) ARQUIVO (sem exibição de foto, apenas upload) #}
+            <div class="card mt-3 mb-4">
+                <div class="card-header p-0">
+                    <button class="btn btn-link w-100 text-start px-3 py-2 d-flex align-items-center color-3"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#arquivo"
+                            aria-expanded="true"
+                            aria-controls="arquivo">
+                        <strong>Foto</strong>
+                        <span class="ms-auto toggle-caret" aria-hidden="true">▼</span>
+                    </button>
+                </div>
+                <div id="arquivo" class="collapse show">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label class="form-label">Enviar arquivo (imagem da antena)</label>
+                                <input type="file" name="foto" class="form-control" accept="image/*">
+                                <small class="text-muted">Formatos aceitos: JPG, PNG. Tamanho máx. conforme configuração do servidor.</small>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                {% if antena.foto_path %}
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="1" id="remover_foto" name="remover_foto">
+                                        <label class="form-check-label" for="remover_foto">
+                                            Remover arquivo atual
+                                        </label>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# AÇÕES #}
+            <div class="d-flex justify-content-end gap-2">
+                <a href="{{ BASE_URL }}/antena" class="btn btn-light">Cancelar</a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check2-circle"></i> {{ antena.id_antena ? 'Salvar Alterações' : 'Cadastrar' }}
+                </button>
+            </div>
+        </form>
+
+    </div>
+    <br><br>
+{% endblock %}
+
+{% block scripts %}
+    {{ parent() }}
+    <script>
+        // Bootstrap validation
+        (function () {
+            'use strict';
+            const forms = document.querySelectorAll('.needs-validation');
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+    </script>
+{% endblock %}

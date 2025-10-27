@@ -19,8 +19,8 @@
 
             {% set default_menu = [
                 {href: BASE_URL ~ '/home', label: 'Início'},
-                {href: BASE_URL ~ '/antena', label: 'Listar Antenas'},
-                {href: BASE_URL ~ '/antena/novo', label: 'Cadastrar Antenas'},
+                {href: BASE_URL ~ '/antena/listar', label: 'Listar Antenas'},
+                {href: BASE_URL ~ '/antena/cadastrar', label: 'Cadastrar Antenas'},
             ] %}
             {% set items = (menu_override is defined and menu_override) ? menu_override : default_menu %}
 

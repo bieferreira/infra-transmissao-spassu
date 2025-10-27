@@ -22,20 +22,29 @@ $options = [
     'uf'       => $uf,
 ];
 
-//$ranking_ufs  = antena_top_ufs(5);
-//$antenas = antena_list($options);
-//$antena = [];
-//$antena = antena_find($id_antena);
-
 $total   = antena_count($options);
 $pages   = (int)ceil($total / 10);
 
-$allowed = '/^(cadastrar|editar|excluir|listar|ver|mapa)$/';
+$allowed = '/^(cadastrar|editar|excluir|listar|mapa|ver)$/';
 
 try {
     $action = preg_match($allowed, $uri_rota, $match) ? $match[0] : '';
 
     echo match ($action) {
+        'cadastrar' => (function () {
+            return APP_TWIG->render('/Antena/antena_form.twig', [
+                'titulo'        => 'Cadastrar Antena',
+                'principal_url' => 'home',
+            ]);
+        })(),
+        'editar' =>APP_TWIG->render('/Antena/antena_form.twig', [
+            'titulo'        => 'Nova Antena',
+            'principal_url' => 'home',
+        ]),
+        'excluir' => APP_TWIG->render('/Antena/antena_form.twig', [
+            'titulo'        => 'Nova Antena',
+            'principal_url' => 'home',
+        ]),
         'listar' => (function () use ($options, $page, $total, $pages, $search, $uf) {
             $ranking_ufs  = antena_top_ufs(5);
             $antenas = antena_list($options);
@@ -52,6 +61,16 @@ try {
                 'uf'       => $uf,
             ]);
         })(),
+        'mapa' => (function () use ($id_antena) {
+            $id_antena  = (int)$id_antena;
+            $antena = antena_find($id_antena);
+
+            return APP_TWIG->render('/Antena/mapa.twig', [
+                'titulo'        => 'Ver Antena',
+                'principal_url' => 'home',
+                'antena'       => $antena,
+            ]);
+        })(),
         'ver' => (function () use ($id_antena) {
             $id_antena  = (int)$id_antena;
             $antena = antena_find($id_antena);
@@ -62,29 +81,6 @@ try {
                 'antena'       => $antena,
                 ]);
         })(),
-        'mapa' => (function () use ($id_antena) {
-            $id_antena  = (int)$id_antena;
-            $antena = antena_find($id_antena);
-
-            return APP_TWIG->render('/Antena/mapa.twig', [
-                'titulo'        => 'Ver Antena',
-                'principal_url' => 'home',
-                'latitude'       => '-20.4698',
-                'antena'       => $antena,
-            ]);
-        })(),
-        'cadastrar1' => APP_TWIG->render('/Antena/antena_form.twig', [
-            'titulo'        => 'Nova Antena',
-            'principal_url' => 'home',
-        ]),
-        'editar' =>APP_TWIG->render('/Antena/antena_form.twig', [
-            'titulo'        => 'Nova Antena',
-            'principal_url' => 'home',
-        ]),
-        'excluir' => APP_TWIG->render('/Antena/antena_form.twig', [
-            'titulo'        => 'Nova Antena',
-            'principal_url' => 'home',
-        ]),
         default => APP_TWIG->render('/404/404.twig'),
     };
 } catch (\Twig\Error\LoaderError $e) {
