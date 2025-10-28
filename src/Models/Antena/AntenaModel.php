@@ -170,3 +170,45 @@ function antena_update(int $id, array $dados): bool
 
     return $stmt->execute();
 }
+
+function antena_create(array $dados): int
+{
+    $pdo = db();
+
+    $sql = "INSERT INTO antenas (
+                descricao,
+                latitude,
+                longitude,
+                uf,
+                altura,
+                foto_path,
+                data_implantacao,
+                id_usuario_inclusao
+            ) VALUES (
+                :descricao,
+                :latitude,
+                :longitude,
+                :uf,
+                :altura,
+                :foto_path,
+                :data_implantacao,
+                :id_usuario_inclusao
+            )";
+
+    $stmt = $pdo->prepare($sql);
+
+    $stmt->bindValue(':descricao', $dados['descricao']);
+    $stmt->bindValue(':latitude', $dados['latitude']);
+    $stmt->bindValue(':longitude', $dados['longitude']);
+    $stmt->bindValue(':uf', $dados['uf']);
+    $stmt->bindValue(':altura', $dados['altura'] ?? null);
+    $stmt->bindValue(':foto_path', $dados['foto_path'] ?? null);
+    $stmt->bindValue(':data_implantacao', $dados['data_implantacao'] ?? null);
+    $stmt->bindValue(':id_usuario_inclusao', ID_USUARIO);
+
+    if ($stmt->execute()) {
+        return (int) $pdo->lastInsertId();
+    }
+
+    return 0;
+}

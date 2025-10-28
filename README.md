@@ -128,3 +128,13 @@
 			==> realizado ajustes e correções
     => Definir layout
 		>> criar form
+    => Implementando Model antena form
+    	>> src / Model / Antena / AntenaModel.php
+    	>> src / Controllers / Antena / AntenaController.php
+    => Permissão escrita
+    	>> docker exec -it InfraTransmissaoSpassuServerWeb bash
+    		=>> chown -R www-data:www-data /var/www/html/public/uploads
+			=>> chmod -R 775 /var/www/html/public/uploads
+    	>> yml -> command: /bin/bash -c "chmod -R 777 /var/www/html/public/uploads && apache2-foreground"
+    		=>> docker compose up -d --buil
+    		

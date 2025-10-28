@@ -26,7 +26,7 @@ $options = [
     'uf'       => $uf,
 ];
 
-$allowed = '/^(atualizar|cadastrar|editar|excluir|listar|mapa|ver)$/';
+$allowed = '/^(atualizar|cadastrar|editar|excluir|listar|mapa|salvar|ver)$/';
 
 try {
     $action = preg_match($allowed, $uri_rota, $match) ? $match[0] : '';
@@ -170,6 +170,69 @@ try {
                 'titulo'        => 'Ver Antena',
                 'principal_url' => 'home',
                 'antena'       => $antena,
+            ]);
+        })(),
+        'salvar' => (function () {
+
+            if($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                http_response_code(405);
+                echo 'Método inválido.';
+                exit;
+            }
+
+            $in = [
+                'descricao'        => trim((string)($_POST['descricao'] ?? '')),
+                'latitude'         => $_POST['latitude'] ?? null,
+                'longitude'        => $_POST['longitude'] ?? null,
+                'uf'               => strtoupper(trim((string)($_POST['uf'] ?? ''))),
+                'altura'           => $_POST['altura'] ?? null,
+                'data_implantacao' => normalize_data($_POST['data_implantacao'] ?? null),
+            ];
+
+            $errors = validate_antena($in);
+
+            if ($errors) {
+                return APP_TWIG->render('/Antena/antena_form.twig', [
+                    'titulo'        => 'Cadastrar Antena',
+                    'principal_url' => 'home',
+                    'errors'        => $errors,
+                ]);
+            }
+
+            // Upload/Remoção mantendo coerência
+            $retorno_upoad = handle_upload($_FILES['foto'] ?? null, null, false);
+
+            if (stripos($retorno_upoad, 'not-allowed') !== false) {
+                return APP_TWIG->render('/Antena/antena_form.twig', [
+                    'titulo'        => 'Cadastrar Antena',
+                    'principal_url' => 'home',
+                    'flash_error'        => 'Tipo de arquivo não permitido, aceito apenas [JPG, PNG]',
+                ]);
+            }
+
+            $in['foto_path'] = $retorno_upoad;
+
+            $newId = antena_create($in);
+
+            if ($newId) {
+                flash('success', 'Antena cadastrada com sucesso!');
+
+                $antena = antena_find($newId);
+
+                return APP_TWIG->render('/Antena/antena_form.twig', [
+                    'titulo'        => 'Editar Antena',
+                    'principal_url' => 'home',
+                    'antena'        => $antena,
+                    'flash_success' => take_flash('success'),
+                ]);
+            }
+
+            flash('error', 'Falha ao Cadastrar antena.');
+
+            return APP_TWIG->render('/Antena/antena_form.twig', [
+                'titulo'        => 'Cadastrar Antena',
+                'principal_url' => 'home',
+                'flash_error'   => take_flash('error'),
             ]);
         })(),
         'ver' => (function () use ($id_antena) {
