@@ -26,7 +26,7 @@
                     <a href="{{ BASE_URL }}/antena/mapa/{{ antena.id_antena }}" class="btn btn-outline-primary" target="_blank">
                         <i class="bi bi-eye"></i> Mapa
                     </a>
-                    <a href="{{ BASE_URL }}/antena/excluir/{{ antena.id_antena }}" class="btn btn-outline-danger ms-2" onclick="return confirm('Deseja realmente excluir esta antena?')">
+                    <a href="{{ BASE_URL }}/antena/excluir/{{ antena.id_antena }}" class="btn btn-outline-danger" onclick="return confirm('Deseja realmente excluir esta antena?')">
                         <i class="bi bi-eye"></i> Excluir
                     </a>
                 {% endif %}
@@ -55,10 +55,11 @@
         {% endif %}
 
         <form
+                id="frm_form"
                 action="{{ BASE_URL }}/antena/{{ antena.id_antena ? 'atualizar/' ~ antena.id_antena : 'salvar' }}"
                 method="post"
                 enctype="multipart/form-data"
-                class="needs-validation"
+                class="needs-validation js-sync-url"
                 novalidate
         >
             {# CSRF opcional #}

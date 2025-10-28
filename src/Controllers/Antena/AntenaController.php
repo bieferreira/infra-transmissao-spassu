@@ -5,7 +5,6 @@ declare(strict_types=1);
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
-
 require __DIR__ . '/../../Service/IBGEService.php';
 require_once __DIR__ . '/../../Models/Antena/AntenaModel.php';
 
@@ -66,6 +65,7 @@ try {
                             'antena'        => $in,
                             'ufs'           => getUfOrdenado(),
                             'errors'        => $errors,
+                            'redir_msg'     => '../editar/'.$id,
                         ]);
             }
 
@@ -82,6 +82,7 @@ try {
                     'antena'        => $in,
                     'ufs'           => getUfOrdenado(),
                     'flash_error'   => 'Tipo de arquivo não permitido, aceito apenas [ '.implode(' | ', $ext_allowed).' ]',
+                    'redir_msg'     => '../editar/'.$id,
                 ]);
             }
 
@@ -95,16 +96,18 @@ try {
                     'antena'        => antena_find($id),
                     'ufs'           => getUfOrdenado(),
                     'flash_success' => take_flash('success'),
+                    'redir_msg'     => '../editar/'.$id,
                 ]);
             }
 
-            flash('error', 'Falha ao atualizar antena.');
+            flash('error', 'Falha ao atualizar antena, verifique Descrição existente.');
             return APP_TWIG->render('/Antena/antena_form.twig', [
                 'titulo'        => 'Editar Antena',
                 'principal_url' => 'home',
                 'antena'        => antena_find($id),
                 'ufs'           => getUfOrdenado(),
                 'flash_error'   => take_flash('error'),
+                'redir_msg'     => '../editar/'.$id,
             ]);
         })(),
         'cadastrar' => (function () {
@@ -149,10 +152,10 @@ try {
                 }
             }
 
+            $params = getParametroConsulta($per_page);
+
             if (antena_delete($id)) {
                 flash('success', 'Antena excluída com sucesso!');
-
-                $params = getParametroConsulta($per_page);
 
                 return APP_TWIG->render('/Antena/antena_list.twig', [
                     'titulo'        => 'Lista de Antenas',
@@ -166,15 +169,24 @@ try {
                     'uf'            => $params['uf'],
                     'flash_success' => take_flash('success'),
                     'flash_error'   => take_flash('error'),
+                    'redir_msg'     => '../listar',
                 ]);
             } else {
+
                 flash('error', 'Falha ao excluir antena.');
-                return APP_TWIG->render('/Antena/antena_form.twig', [
-                    'titulo'        => 'Editar Antena',
+                return APP_TWIG->render('/Antena/antena_list.twig', [
+                    'titulo'        => 'Listar Antenas',
                     'principal_url' => 'home',
-                    'antena'        => $antena,
+                    'ranking_ufs'   => antena_top_ufs($rank),
+                    'antenas'       => antena_list($params['options']),
+                    'page'          => $params['page'],
+                    'total'         => $params['total'],
+                    'pages'         => $params['pages'],
+                    'q'             => $params['search'],
+                    'uf'            => $params['uf'],
                     'flash_success' => take_flash('success'),
                     'flash_error'   => take_flash('error'),
+                    'redir_msg'     => '../listar',
                 ]);
             }
 
@@ -227,6 +239,7 @@ try {
                     'principal_url' => 'home',
                     'antena'        => $in,
                     'errors'        => $errors,
+                    'redir_msg'     => 'cadastrar',
                 ]);
             }
 
@@ -239,6 +252,7 @@ try {
                     'principal_url' => 'home',
                     'antena'        => $in,
                     'flash_error'   => 'Tipo de arquivo não permitido, aceito apenas [ '.implode(' | ', $ext_allowed).' ]',
+                    'redir_msg'     => 'cadastrar',
                 ]);
             }
 
@@ -253,6 +267,7 @@ try {
                     'principal_url' => 'home',
                     'antena'        => antena_find($newId),
                     'flash_success' => take_flash('success'),
+                    'redir_msg'     => 'editar/'.$newId,
                 ]);
             }
 
@@ -262,6 +277,7 @@ try {
                 'principal_url' => 'home',
                 'antena'        => $in,
                 'flash_error'   => take_flash('error'),
+                'redir_msg'     => 'cadastrar',
             ]);
         })(),
         'ver' => (function () use ($id_antena) {

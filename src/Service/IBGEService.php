@@ -24,7 +24,11 @@ function getEstadosIBGE(): array
             }
         }
     } catch (Throwable $e) {
+        if($validar) {
            response_api_error($e);
+        } else {
+            $data = [];
+        }
     }
 
     return $data;

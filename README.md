@@ -155,3 +155,8 @@
     	>> src / Controllers / Antena / AntenaController.php 
     	>> refatorando consultas validar exclusao lógica
     	>> refatorando listar otimizar captura de parametros
+    => Implementando melhoria mudar rota browser
+    	>> Realizado testes finais
+    => Não realizado funcionalidade usuario e autenticacao
+
+fim 16:26 MS

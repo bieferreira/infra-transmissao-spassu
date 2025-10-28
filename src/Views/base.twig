@@ -31,20 +31,39 @@
 
 {# Slot para JS extra por página #}
 {% block scripts %}
-    <script>
+    <script>function ocultarAlert(alert) {
+            alert.classList.add('fade');
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 500);
+        }
+
+        function ajusteRota() {
+
+            const redir_msg = "{{ redir_msg|e('js') }}";
+            if(redir_msg) {
+                const form = document.querySelector('#frm_form');
+
+                if(form && redir_msg === 'cadastrar') {
+                    const formData = new FormData(form);
+                    const params = new URLSearchParams(formData).toString();
+                    history.pushState({}, "", redir_msg+"?" + params);
+                } else {
+                    window.location.replace(redir_msg);
+                }
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             const alerts = document.querySelectorAll('.alert');
             alerts.forEach(alert => {
                 setTimeout(() => {
-                    alert.classList.add('fade');
-                    alert.classList.remove('show');
-                    alert.style.transition = 'opacity 0.5s ease';
-                    alert.style.opacity = '0';
-
-                    setTimeout(() => alert.remove(), 500);
+                    // dispara as duas ao mesmo tempo
+                    ocultarAlert(alert);
+                    ajusteRota();
                 }, 4000);
             });
         });
+
     </script>
 {% endblock %}
 </body>

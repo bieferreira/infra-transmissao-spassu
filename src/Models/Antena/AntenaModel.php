@@ -146,7 +146,7 @@ function antena_find(int $id): ?array
 function antena_update(int $id, array $dados): bool
 {
     $pdo = db();
-
+    try {
     $sql = "UPDATE antenas SET 
                 descricao = :descricao,
                 latitude = :latitude,
@@ -169,7 +169,30 @@ function antena_update(int $id, array $dados): bool
     $stmt->bindValue(':data_implantacao', $dados['data_implantacao']);
     $stmt->bindValue(':id_usuario_alteracao', ID_USUARIO);
 
-    return $stmt->execute();
+        if ($stmt->execute()) {
+            return true;
+            //$lastId = $pdo->lastInsertId();
+            //echo "<h3 style='color:green'>Assunto cadastrado com sucesso!</h3>";
+            //setIframeMensagemErro();
+            //redirecionaPrincipal('../view/assuntoGrid.php');
+
+        }
+
+    } catch (PDOException $e) {
+
+        $mensagemerro = $e->getMessage();
+
+    } catch (InvalidArgumentException $e) {
+
+        $mensagemerro = $e->getMessage();
+
+    } catch (Exception $e) {
+
+        $mensagemerro = $e->getMessage();
+
+    }
+
+    return false;
 }
 
 function antena_create(array $dados): int
