@@ -8,6 +8,7 @@ services:
       - "9090:80"
     volumes:
       - .:/var/www/html
+    command: /bin/bash -c "chmod -R 777 /var/www/html/public/uploads && apache2-foreground"
     networks:
       - infratransmissaonetwork
 

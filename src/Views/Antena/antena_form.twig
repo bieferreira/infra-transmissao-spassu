@@ -16,15 +16,15 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
                 <h2 class="mb-0 color-1">{{ titulo | default(antena.id_antena ? 'Editar Antena' : 'Cadastrar Antena') }}</h2>
-                {% if antena.id_antena %}
-                    <small class="text-muted">ID: {{ antena.id_antena }}</small>
-                {% endif %}
             </div>
 
             <div class="d-flex gap-2">
                 {% if antena.id_antena %}
-                    <a href="{{ BASE_URL }}/antena/mostrar/{{ antena.id_antena }}" class="btn btn-outline-secondary">
+                    <a href="{{ BASE_URL }}/antena/ver/{{ antena.id_antena }}" class="btn btn-outline-info">
                         <i class="bi bi-eye"></i> Ver
+                    </a>
+                    <a href="{{ BASE_URL }}/antena/mapa/{{ antena.id_antena }}" class="btn btn-outline-primary" target="_blank">
+                        <i class="bi bi-eye"></i> Mapa
                     </a>
                 {% endif %}
                 <a href="{{ BASE_URL }}/antena" class="btn btn-secondary">
@@ -98,12 +98,15 @@
 
 
                         <div class="col-md-6">
-                            <label class="form-label">Altura</label>
-                            <input type="text" name="altura" class="form-control"
-                                   value="{{ old.altura | default(antena.altura) }}">
+                            <label class="form-label">Altura (metros)</label>
+                            <input type="number" name="altura" class="form-control"
+                                   value="{{ old.altura | default(antena.altura) }}"
+                                   step="0.01">
+                            <div class="invalid-feedback">Informe uma altura válida (3,50).</div>
                         </div>
 
                         <div class="col-md-6">
+                            {{ old.data_implantacao }}
                             <label class="form-label">Data de Implantação</label>
                                 {% set impl = old.data_implantacao
                                 | default(antena.data_implantacao

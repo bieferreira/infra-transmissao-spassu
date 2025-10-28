@@ -21,8 +21,8 @@ class AntenasSeeder extends AbstractSeed
             for ($i = 1; $i <= $total; $i++) {
                 $batch[] = [
                     'descricao'         => sprintf('ANT-%06d', $i),
-                    'latitude'          => $this->randCoordenada(-33.7500, 5.3000),
-                    'longitude'         => $this->randCoordenada(-73.9900, -34.7900),
+                    'latitude'          => $this->gerarLatitude(),
+                    'longitude'         => $this->gerarLongitude(),
                     'uf'            => $this->randUf(),
                     'altura'            => $this->randAltura(),
                     'data_implantacao'  => $this->randDataImplantacao(),
@@ -76,11 +76,20 @@ class AntenasSeeder extends AbstractSeed
         }
     }
 
-    private function randCoordenada(float $min, float $max): float
+    private function randFloat(float $min, float $max): float
     {
         return $min + lcg_value() * ($max - $min);
     }
 
+    function gerarLatitude(): float
+    {
+        return round(mt_rand(-33750000, 5270000) / 1000000, 6);
+    }
+
+    function gerarLongitude(): float
+    {
+        return round(mt_rand(-73980000, -34790000) / 1000000, 6);
+    }
     private function randUf(): string
     {
         static $ufs = [
@@ -95,7 +104,7 @@ class AntenasSeeder extends AbstractSeed
     private function randAltura(): float
     {
         //entre 3 e 20 metros
-        return round($this->randCoordenada(3, 20), 2);
+        return round($this->randFloat(3, 20), 2);
     }
 
     private function randDataImplantacao(): ?string

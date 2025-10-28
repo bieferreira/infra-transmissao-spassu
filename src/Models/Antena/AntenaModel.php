@@ -128,7 +128,7 @@ function antena_count(array $options = []): int
 function antena_find(int $id): ?array
 {
     $pdo = db();
-    $stmt = $pdo->prepare('SELECT a.id_antena, a.descricao, a.latitude, a.longitude, a.uf, a.data_implantacao, a.foto_path, e.uf_descricao
+    $stmt = $pdo->prepare('SELECT a.id_antena, a.descricao, a.latitude, a.longitude, a.uf, a.altura, a.data_implantacao, a.foto_path, e.uf_descricao
                         FROM antenas AS a
                         INNER JOIN estados AS e ON e.uf = a.uf 
                         WHERE id_antena = :id LIMIT 1');
@@ -137,4 +137,36 @@ function antena_find(int $id): ?array
 
     $row = $stmt->fetch();
     return $row ?: null;
+}
+
+/**
+ * Atualizar antena
+ */
+function antena_update(int $id, array $dados): bool
+{
+    $pdo = db();
+
+    $sql = "UPDATE antenas SET 
+                descricao = :descricao,
+                latitude = :latitude,
+                longitude = :longitude,
+                uf = :uf,
+                altura = :altura,
+                foto_path = COALESCE(:foto_path, foto_path),
+                data_implantacao = :data_implantacao,
+                id_usuario_alteracao = :id_usuario_alteracao
+            WHERE id_antena = :id";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+    $stmt->bindValue(':descricao', $dados['descricao']);
+    $stmt->bindValue(':latitude', $dados['latitude']);
+    $stmt->bindValue(':longitude', $dados['longitude']);
+    $stmt->bindValue(':uf', $dados['uf']);
+    $stmt->bindValue(':altura', $dados['altura']);
+    $stmt->bindValue(':foto_path', $dados['foto_path'] ?? null);
+    $stmt->bindValue(':data_implantacao', $dados['data_implantacao']);
+    $stmt->bindValue(':id_usuario_alteracao', ID_USUARIO);
+
+    return $stmt->execute();
 }

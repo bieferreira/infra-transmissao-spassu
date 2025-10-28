@@ -21,6 +21,7 @@ const DB_PORT = '3306';
 const DB_NAME = 'infratransmissao';
 const DB_USER = 'user';
 const DB_PASS = '1nfr4Sp4ssu';
+const ID_USUARIO = 1;
 
 $globals = [
     'BASE_URL'   => BASE_URL,

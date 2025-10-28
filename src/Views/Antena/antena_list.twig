@@ -93,7 +93,7 @@
                             <td>{{ a.latitude }}</td>
                             <td>{{ a.longitude }}</td>
                             <td>{{ a.uf }}</td>
-                            <td>{{ a.data_impantacao|date('d/m/Y H:i') }}</td>
+                            <td>{{ a.data_impantacao|date('d/m/Y') }}</td>
                             <td class="text-center">
                                 <a href="{{ BASE_URL }}/antena/ver/{{ a.id_antena }}" class="btn btn-sm btn-outline-info ms-3">Ver</a>
                                 <a href="{{ BASE_URL }}/antena/mapa/{{ a.id_antena }}" class="btn btn-sm btn-outline-primary ms-3" target="_blank">Mapa</a>

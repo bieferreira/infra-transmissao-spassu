@@ -82,6 +82,7 @@ final class InitInfraSpassu extends AbstractMigration
                 'null'  => true,
             ])
             ->addColumn('alterado_em', 'datetime', [
+                'update'  => 'CURRENT_TIMESTAMP',
                 'null' => true,
             ])
             ->addIndex(['descricao', 'excluido'], [
@@ -151,6 +152,7 @@ final class InitInfraSpassu extends AbstractMigration
                 'null'  => true,
             ])
             ->addColumn('alterado_em', 'datetime', [
+                'update'  => 'CURRENT_TIMESTAMP',
                 'null' => true,
             ])
             ->addIndex(['email', 'excluido'], [
@@ -214,5 +216,6 @@ final class InitInfraSpassu extends AbstractMigration
         $this->execute('DROP PROCEDURE IF EXISTS sp_delete_antena');
         $this->execute('DROP TABLE IF EXISTS infratransmissao.antenas');
         $this->execute('DROP TABLE IF EXISTS infratransmissao.usuarios');
+        $this->execute('DROP TABLE IF EXISTS infratransmissao.estados');
     }
 }
