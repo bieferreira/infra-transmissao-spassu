@@ -26,6 +26,9 @@
                     <a href="{{ BASE_URL }}/antena/mapa/{{ antena.id_antena }}" class="btn btn-outline-primary" target="_blank">
                         <i class="bi bi-eye"></i> Mapa
                     </a>
+                    <a href="{{ BASE_URL }}/antena/excluir/{{ antena.id_antena }}" class="btn btn-outline-danger ms-2" onclick="return confirm('Deseja realmente excluir esta antena?')">
+                        <i class="bi bi-eye"></i> Excluir
+                    </a>
                 {% endif %}
                 <a href="{{ BASE_URL }}/antena" class="btn btn-secondary">
                     <i class="bi bi-arrow-left"></i> Voltar

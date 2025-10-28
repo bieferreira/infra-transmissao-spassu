@@ -11,6 +11,24 @@
             </a>
         </div>
 
+        {# ALERTAS DE ERRO / SUCESSO (opcional) #}
+        {% if flash_success %}
+            <div class="alert alert-success">{{ flash_success }}</div>
+        {% endif %}
+        {% if flash_error %}
+            <div class="alert alert-danger">{{ flash_error }}</div>
+        {% endif %}
+        {% if errors is defined and errors %}
+            <div class="alert alert-danger mb-3">
+                <strong>Corrija os campos abaixo:</strong>
+                <ul class="mb-0">
+                    {% for e in errors %}
+                        <li>{{ e }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
         {# Ranking Top 5 UFs #}
         <div class="card mt-5 mb-3">
             <div class="card-header p-0">

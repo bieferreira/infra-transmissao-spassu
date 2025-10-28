@@ -152,4 +152,6 @@
     	>> realizando correções identificadas
     => Implementando Model antena excluir
     	>> src / Model / Antena / AntenaModel.php
-    	>> src / Controllers / Antena / AntenaController.php
+    	>> src / Controllers / Antena / AntenaController.php 
+    	>> refatorando consultas validar exclusao lógica
+    	>> refatorando listar otimizar captura de parametros

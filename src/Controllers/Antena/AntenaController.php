@@ -15,20 +15,12 @@ $uri_rota = $uri[2] ?? '';
 $uri_rota = $uri_rota !== '' ? $uri_rota : 'listar';
 $id_antena = $uri[3] ?? '';
 
-// parâmetros consulta
-$page    = isset($_GET['page']) && (int)$_GET['page'] > 0 ? (int)$_GET['page'] : 1;
-$search  = isset($_GET['q']) ? (string)$_GET['q'] : '';
-$uf      = isset($_GET['uf']) ? (string)$_GET['uf'] : '';
-
-$options = [
-    'page'     => $page,
-    'per_page' => 10,
-    'search'   => $search,
-    'uf'       => $uf,
-];
-
 //upload permitidos
 $ext_allowed = ['jpg','png'];
+//total ufs maior incidencia
+$rank = 5;
+//registros por página
+$per_page = 10;
 
 try {
     $action = preg_match(allowed(), $uri_rota, $match) ? $match[0] : '';
@@ -124,39 +116,83 @@ try {
                 ]);
         })(),
         'editar' => (function () use ($id_antena) {
-            $id_antena  = (int)$id_antena;
-            $antena = antena_find($id_antena);
 
                 return APP_TWIG->render('/Antena/antena_form.twig', [
                     'titulo'        => 'Editar Antena',
                     'principal_url' => 'home',
-                    'antena'        => $antena,
+                    'antena'        => antena_find((int)$id_antena),
                     'ufs'           => getUfOrdenado(),
                 ]);
 
         })(),
-        'excluir' => APP_TWIG->render('/Antena/antena_form.twig', [
-            'titulo'        => 'Nova Antena',
-            'principal_url' => 'home',
-        ]),
-        'listar' => (function () use ($options, $page, $search, $uf) {
+        'excluir' => (function () use ($id_antena, $rank, $per_page) {
+            $id = (int)$id_antena;
 
-            $total   = antena_count($options);
-            $pages   = (int)ceil($total / 10);
+            if (!$id) {
+                http_response_code(400);
+                echo 'ID inválido.';
+                exit;
+            }
 
-            $ranking_ufs  = antena_top_ufs(5);
-            $antenas = antena_list($options);
+            $antena = antena_find($id);
+
+            if (!$antena) {
+                http_response_code(404);
+                echo 'Antena não encontrada.';
+                exit;
+            }
+
+            if (!empty($antena['foto_path'])) {
+                if( $antena['foto_path'] !== '/uploads/fotos_antenas/antena.png') {
+                    $abs = $_SERVER['DOCUMENT_ROOT'] . $antena['foto_path'];
+                    if (is_file($abs)) @unlink($abs);
+                }
+            }
+
+            if (antena_delete($id)) {
+                flash('success', 'Antena excluída com sucesso!');
+
+                $params = getParametroConsulta($per_page);
+
+                return APP_TWIG->render('/Antena/antena_list.twig', [
+                    'titulo'        => 'Lista de Antenas',
+                    'principal_url' => 'home',
+                    'ranking_ufs'   => antena_top_ufs($rank),
+                    'antenas'       => antena_list($params['options']),
+                    'page'          => $params['page'],
+                    'total'         => $params['total'],
+                    'pages'         => $params['pages'],
+                    'q'             => $params['search'],
+                    'uf'            => $params['uf'],
+                    'flash_success' => take_flash('success'),
+                    'flash_error'   => take_flash('error'),
+                ]);
+            } else {
+                flash('error', 'Falha ao excluir antena.');
+                return APP_TWIG->render('/Antena/antena_form.twig', [
+                    'titulo'        => 'Editar Antena',
+                    'principal_url' => 'home',
+                    'antena'        => $antena,
+                    'flash_success' => take_flash('success'),
+                    'flash_error'   => take_flash('error'),
+                ]);
+            }
+
+        })(),
+        'listar' => (function () use ($rank, $per_page) {
+
+            $params = getParametroConsulta($per_page);
 
             return APP_TWIG->render('/Antena/antena_list.twig', [
                 'titulo'        => 'Lista de Antenas',
                 'principal_url' => 'home',
-                'ranking_ufs'  => $ranking_ufs,
-                'antenas'  => $antenas,
-                'page'     => $page,
-                'total'    => $total,
-                'pages'    => $pages,
-                'q'        => $search,
-                'uf'       => $uf,
+                'ranking_ufs'  => antena_top_ufs($rank),
+                'antenas'  => antena_list($params['options']),
+                'page'     => $params['page'],
+                'total'    => $params['total'],
+                'pages'    => $params['pages'],
+                'q'        => $params['search'],
+                'uf'       => $params['uf'],
             ]);
         })(),
         'mapa' => (function () use ($id_antena) {
@@ -212,33 +248,28 @@ try {
 
             if ($newId) {
                 flash('success', 'Antena cadastrada com sucesso!');
-
-                $antena = antena_find($newId);
-
                 return APP_TWIG->render('/Antena/antena_form.twig', [
                     'titulo'        => 'Editar Antena',
                     'principal_url' => 'home',
-                    'antena'        => $antena,
+                    'antena'        => antena_find($newId),
                     'flash_success' => take_flash('success'),
                 ]);
             }
 
             flash('error', 'Falha ao Cadastrar antena.');
-
             return APP_TWIG->render('/Antena/antena_form.twig', [
                 'titulo'        => 'Cadastrar Antena',
                 'principal_url' => 'home',
+                'antena'        => $in,
                 'flash_error'   => take_flash('error'),
             ]);
         })(),
         'ver' => (function () use ($id_antena) {
-            $id_antena  = (int)$id_antena;
-            $antena = antena_find($id_antena);
 
             return APP_TWIG->render('/Antena/antena_view.twig', [
                 'titulo'        => 'Ver Antena',
                 'principal_url' => 'home',
-                'antena'       => $antena,
+                'antena'       => antena_find((int)$id_antena),
             ]);
         })(),
         default => APP_TWIG->render('/404/404.twig'),
@@ -323,8 +354,10 @@ function handle_upload(?array $file, ?string $existingPath = '', bool $removeFla
     // Remover arquivo atual
     if ($removeFlag && $existingPath) {
         $abs = $_SERVER['DOCUMENT_ROOT'] . $existingPath;
-        if (is_file($abs)) @unlink($abs);
-        return '';
+        if( $existingPath !== '/uploads/fotos_antenas/antena.png') {
+            if (is_file($abs)) @unlink($abs);
+            return '';
+        }
     }
 
     if (!$file || empty($file['name']) || $file['error'] === UPLOAD_ERR_NO_FILE) {
@@ -357,7 +390,9 @@ function handle_upload(?array $file, ?string $existingPath = '', bool $removeFla
     // (Opcional) Remove o antigo após sucesso
     if ($existingPath) {
         $oldAbs = $_SERVER['DOCUMENT_ROOT'] . $existingPath;
-        if (is_file($oldAbs)) @unlink($oldAbs);
+        if( $existingPath !== '/uploads/fotos_antenas/antena.png') {
+            if (is_file($oldAbs)) @unlink($oldAbs);
+        }
     }
 
     return '/uploads/fotos_antenas/' . $filename;
@@ -390,4 +425,24 @@ function getUfOrdenado() {
 
 function allowed(): string {
     return $allowed = '/^(atualizar|cadastrar|editar|excluir|listar|mapa|salvar|ver)$/';
+}
+
+function getParametroConsulta($per_page){
+    // parâmetros consulta
+    $page    = isset($_GET['page']) && (int)$_GET['page'] > 0 ? (int)$_GET['page'] : 1;
+    $search  = isset($_GET['q']) ? (string)$_GET['q'] : '';
+    $uf      = isset($_GET['uf']) ? (string)$_GET['uf'] : '';
+    $per_page = isset($_GET['per_page']) ? (int)$_GET['per_page'] : $per_page;
+
+    $options = [
+        'page'     => $page,
+        'per_page' => $per_page,
+        'search'   => $search,
+        'uf'       => $uf,
+    ];
+
+    $total   = antena_count($options);
+    $pages   = (int)ceil($total / $per_page);
+
+    return compact('page', 'search', 'uf', 'options', 'total', 'pages');
 }

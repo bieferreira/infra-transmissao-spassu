@@ -18,6 +18,7 @@ function antena_top_ufs(int $limit = 5): array
         COUNT(*) AS total
     FROM antenas AS a
     INNER JOIN estados AS e ON e.uf = a.uf
+    WHERE excluido = '0' 
     GROUP BY a.uf, e.uf_descricao
     ORDER BY total DESC
     LIMIT {$limit};
@@ -57,11 +58,11 @@ function antena_list(array $options = []): array
         $params[':uf'] = $uf;
     }
 
-    $sql = 'SELECT a.id_antena, a.descricao, a.latitude, a.longitude, a.uf, a.data_implantacao, a.altura 
-            FROM antenas a';
+    $sql = "SELECT a.id_antena, a.descricao, a.latitude, a.longitude, a.uf, a.data_implantacao, a.altura 
+            FROM antenas a  WHERE excluido = '0' ";
 
     if ($where) {
-        $sql .= ' WHERE ' . implode(' AND ', $where);
+        $sql .= " AND " . implode(' AND ', $where);
     }
 
     $sql .= ' ORDER BY a.id_antena DESC
@@ -104,9 +105,9 @@ function antena_count(array $options = []): int
         $params[':uf'] = $uf;
     }
 
-    $sql = 'SELECT COUNT(*) AS total FROM antenas';
+    $sql = "SELECT COUNT(*) AS total FROM antenas WHERE excluido = '0' ";
     if ($where) {
-        $sql .= ' WHERE ' . implode(' AND ', $where);
+        $sql .= " AND " . implode(' AND ', $where);
     }
 
     $pdo = db();
@@ -128,10 +129,10 @@ function antena_count(array $options = []): int
 function antena_find(int $id): ?array
 {
     $pdo = db();
-    $stmt = $pdo->prepare('SELECT a.id_antena, a.descricao, a.latitude, a.longitude, a.uf, a.altura, a.data_implantacao, a.foto_path, e.uf_descricao
+    $stmt = $pdo->prepare("SELECT a.id_antena, a.descricao, a.latitude, a.longitude, a.uf, a.altura, a.data_implantacao, a.foto_path, e.uf_descricao
                         FROM antenas AS a
                         INNER JOIN estados AS e ON e.uf = a.uf 
-                        WHERE id_antena = :id LIMIT 1');
+                        WHERE id_antena = :id AND excluido = '0' LIMIT 1");
     $stmt->bindValue(':id', $id, PDO::PARAM_INT);
     $stmt->execute();
 
@@ -211,4 +212,28 @@ function antena_create(array $dados): int
     }
 
     return 0;
+}
+
+function antena_delete(int $id): bool
+{
+    $pdo = db();
+
+    try {
+        $id_usuario_inclusao = ID_USUARIO;
+
+        $sql = "CALL sp_delete_antena(:id_antena, :id_usuario_inclusao)";
+        $sqlPdo = $pdo->prepare($sql);
+        $sqlPdo->bindParam(':id_antena', $id);
+        $sqlPdo->bindParam(':id_usuario_inclusao', $id_usuario_inclusao);
+
+
+        if ($sqlPdo->execute()) {
+            $retorno = true;
+        }
+
+    } catch (PDOException $e) {
+        $retorno = false;
+    }
+
+    return $retorno;
 }

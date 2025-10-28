@@ -15,6 +15,7 @@
     {% if css_extra is defined and css_extra %}
         <link rel="stylesheet" href="{{ css_extra }}" />
     {% endif %}
+
 </head>
 <body class="bg-body body-bg-limited">
 
@@ -29,6 +30,22 @@
 <script src="{{ ASSETS_URL }}/js/bootstrap.bundle.min.js"></script>
 
 {# Slot para JS extra por página #}
-{% block scripts %}{% endblock %}
+{% block scripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.classList.add('fade');
+                    alert.classList.remove('show');
+                    alert.style.transition = 'opacity 0.5s ease';
+                    alert.style.opacity = '0';
+
+                    setTimeout(() => alert.remove(), 500);
+                }, 4000);
+            });
+        });
+    </script>
+{% endblock %}
 </body>
 </html>
