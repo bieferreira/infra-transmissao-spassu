@@ -23,10 +23,10 @@ class AntenasSeeder extends AbstractSeed
                     'descricao'         => sprintf('ANT-%06d', $i),
                     'latitude'          => $this->gerarLatitude(),
                     'longitude'         => $this->gerarLongitude(),
-                    'uf'            => $this->randUf(),
+                    'uf'                => $this->randUf(),
                     'altura'            => $this->randAltura(),
                     'data_implantacao'  => $this->randDataImplantacao(),
-                    'foto_path'              => '/uploads/fotos_antenas/antena.png',
+                    'foto_path'         => '/uploads/fotos_antenas/antena.png',
                 ];
 
                 if (count($batch) === self::CHUNK) {
@@ -83,12 +83,12 @@ class AntenasSeeder extends AbstractSeed
 
     function gerarLatitude(): float
     {
-        return round(mt_rand(-33750000, 5270000) / 1000000, 6);
+        return round(mt_rand(-23750000, 4270000) / 1000000, 6);
     }
 
     function gerarLongitude(): float
     {
-        return round(mt_rand(-73980000, -34790000) / 1000000, 6);
+        return round(mt_rand(-63980000, -24790000) / 1000000, 6);
     }
     private function randUf(): string
     {

@@ -25,6 +25,8 @@
   "require": {
     "php": ">=8.2.29.",
     "twig/twig": "^3.0",
-    "twbs/bootstrap": "^5.3"
+    "twbs/bootstrap": "^5.3",
+    "ext-crl": "*",
+    "ext-curl": "*"
   }
 }

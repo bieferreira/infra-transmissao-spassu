@@ -71,7 +71,7 @@
                         <div class="col-md-6">
                             <label class="form-label">Descrição <span class="text-danger">*</span></label>
                             <input type="text" name="descricao" class="form-control" required
-                                   value="{{ old.descricao | default(antena.descricao) }}">
+                                   value="{{ old.descricao | default(antena.descricao) }}" maxlength="100">
                             <div class="invalid-feedback">Informe a descrição.</div>
                         </div>
 
@@ -81,10 +81,10 @@
                                 <select name="uf" class="form-select" required>
                                     <option value="">Selecione...</option>
                                     {% for uf in ufs %}
-                                        {% set uf_sigla = uf.uf is defined ? uf.uf : uf %}
+                                        {% set uf_sigla = uf.sigla is defined ? uf.sigla : uf %}
                                         <option value="{{ uf_sigla }}"
                                                 {{ (old.uf | default(antena.uf)) == uf_sigla ? 'selected' : '' }}>
-                                            {{ uf_sigla }}{% if uf.uf_descricao is defined %} — {{ uf.uf_descricao }}{% endif %}
+                                            {{ uf_sigla }}{% if uf.nome is defined %} — {{ uf.nome }}{% endif %}
                                         </option>
                                     {% endfor %}
                                 </select>
@@ -98,10 +98,11 @@
 
 
                         <div class="col-md-6">
-                            <label class="form-label">Altura (metros)</label>
+                            <label class="form-label">Altura (metros) <span class="text-danger">*</span></label>
                             <input type="number" name="altura" class="form-control"
                                    value="{{ old.altura | default(antena.altura) }}"
-                                   step="0.01">
+                                   required
+                                   step="0.01" min="0.01">
                             <div class="invalid-feedback">Informe uma altura válida (3,50).</div>
                         </div>
 
@@ -140,7 +141,7 @@
                                        step="0.0000001" min="-90" max="90"
                                        placeholder="-20.469700"
                                        value="{{ old.latitude | default(antena.latitude) }}">
-                                <div class="invalid-feedback">Informe uma latitude válida (entre -90 e 90).</div>
+                                <div class="invalid-feedback">Informe uma latitude válida (entre -90 e 90)  e no máximo 7 casas decimais..</div>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Longitude <span class="text-danger">*</span></label>
@@ -148,7 +149,7 @@
                                        step="0.0000001" min="-180" max="180"
                                        placeholder="-54.620100"
                                        value="{{ old.longitude | default(antena.longitude) }}">
-                                <div class="invalid-feedback">Informe uma longitude válida (entre -180 e 180).</div>
+                                <div class="invalid-feedback">Informe uma longitude válida (entre -180 e 180)  e no máximo 7 casas decimais..</div>
                             </div>
                         </div>
                     </div>

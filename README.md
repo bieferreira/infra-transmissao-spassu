@@ -137,4 +137,19 @@
 			=>> chmod -R 775 /var/www/html/public/uploads
     	>> yml -> command: /bin/bash -c "chmod -R 777 /var/www/html/public/uploads && apache2-foreground"
     		=>> docker compose up -d --buil
-    		
+    => Implementando Model antena form
+ 		>> cadastrar antena
+    	>> src / Model / Antena / AntenaModel.php
+    	>> src / Controllers / Antena / AntenaController.php
+    => Integração dados UF
+    	>> Consumir api recuperar dados uf
+        >> src / Services / IBGEService.php
+        >> Validar response ou não dinamicamente
+    => Carga dados
+    	>> refatorar carga uf corresponder com localização
+    	>> Carga muito lenda, desconsiderado
+    => Realizando teste 
+    	>> realizando correções identificadas
+    => Implementando Model antena excluir
+    	>> src / Model / Antena / AntenaModel.php
+    	>> src / Controllers / Antena / AntenaController.php

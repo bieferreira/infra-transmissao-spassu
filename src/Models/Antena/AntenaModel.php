@@ -57,7 +57,7 @@ function antena_list(array $options = []): array
         $params[':uf'] = $uf;
     }
 
-    $sql = 'SELECT a.id_antena, a.descricao, a.latitude, a.longitude, a.uf, a.data_implantacao 
+    $sql = 'SELECT a.id_antena, a.descricao, a.latitude, a.longitude, a.uf, a.data_implantacao, a.altura 
             FROM antenas a';
 
     if ($where) {

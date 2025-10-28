@@ -2,22 +2,7 @@
 
 {% block title %}{{ titulo | default('Ver Antena') }}{% endblock %}
 
-{% block styles %}
-    {{ parent() }}
-    <link
-            rel="stylesheet"
-            href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-            integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-            crossorigin=""
-    />
-
-    <style>
-        #map {
-            height: 400px;
-            width: 100%;
-        }
-    </style>
-{% endblock %}
+{% block styles %}{% endblock %}
 
 {% block content %}
     <div class="container py-4 bg-white">
@@ -42,7 +27,6 @@
             </div>
         </div>
 
-        {# 1) DETALHES ACIMA (100% largura) #}
         <div class="card card-full mt-5 mb-3">
             <div class="card-header color-3">
                 <strong>Detalhes da Antena</strong>
@@ -57,41 +41,23 @@
                         {{ antena.uf }}{% if antena.uf_descricao %} — {{ antena.uf_descricao }}{% endif %}
                     </dd>
 
-                    {% if antena.endereco %}
-                        <dt class="col-sm-4 col-md-3 meta-label">Endereço</dt>
-                        <dd class="col-sm-8 col-md-9">{{ antena.endereco }}</dd>
-                    {% endif %}
-
-                    <dt class="col-sm-4 col-md-3 meta-label">Latitude</dt>
-                    <dd class="col-sm-8 col-md-9 copyable" data-copy="{{ antena.latitude }}">{{ antena.latitude }}</dd>
-
-                    <dt class="col-sm-4 col-md-3 meta-label">Longitude</dt>
-                    <dd class="col-sm-8 col-md-9 copyable" data-copy="{{ antena.longitude }}">{{ antena.longitude }}</dd>
+                    <dt class="col-sm-4 col-md-3 meta-label">Altura</dt>
+                    <dd class="col-sm-8 col-md-9">{{ antena.altura|number_format(2, ',', '.') }}</dd>
 
                     {% set implantacao = antena.data_implantacao | default(antena.data_impantacao) %}
-                    {% if implantacao %}
-                        <dt class="col-sm-4 col-md-3 meta-label">Implantação</dt>
-                        <dd class="col-sm-8 col-md-9">{{ implantacao | date('d/m/Y H:i') }}</dd>
-                    {% endif %}
+                    <dt class="col-sm-4 col-md-3 meta-label">Implantação</dt>
+                    <dd class="col-sm-8 col-md-9">{{ implantacao | date('d/m/Y') }}</dd>
 
-                    {% if antena.status %}
-                        <dt class="col-sm-4 col-md-3 meta-label">Status</dt>
-                        <dd class="col-sm-8 col-md-9">
-                        <span class="badge {{ antena.status in ['ATIVA','ATIVO'] ? 'bg-success' : 'bg-secondary' }}">
-                            {{ antena.status }}
-                        </span>
-                        </dd>
-                    {% endif %}
+                    <dt class="col-sm-4 col-md-3 meta-label">Latitude</dt>
+                    <dd class="col-sm-8 col-md-9">{{ antena.latitude|number_format(7, ',', '.') }}</dd>
 
-                    {% if antena.observacao %}
-                        <dt class="col-sm-4 col-md-3 meta-label">Observações</dt>
-                        <dd class="col-sm-8 col-md-9">{{ antena.observacao }}</dd>
-                    {% endif %}
+                    <dt class="col-sm-4 col-md-3 meta-label">Longitude</dt>
+                    <dd class="col-sm-8 col-md-9">{{ antena.longitude|number_format(7, ',', '.') }}</dd>
+
                 </dl>
             </div>
         </div>
 
-        {# 2) MAPA (100% largura) #}
         <div class="card mt-5 mb-3">
             <div class="card-header p-0">
                 <button class="btn btn-link w-100 text-start px-3 py-2 d-flex align-items-center color-3"
@@ -129,7 +95,6 @@
             </div>
         </div>
 
-        {# 3) IMAGEM (100% largura) #}
         <div class="card mt-5 mb-3">
             <div class="card-header p-0">
                 <button class="btn btn-link w-100 text-start px-3 py-2 d-flex align-items-center color-3"
@@ -154,31 +119,7 @@
 
     </div>
     <br><br>
+    </div>
 {% endblock %}
 
-{% block scripts %}
-    {{ parent() }}
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-            crossorigin=""></script>
-    <script>
-        // Definir coordenadas (Campo Grande - MS, por exemplo)
-        const latitude = -20.4697;
-        const longitude = -54.6201;
-
-        // Inicializar o mapa
-        const map = L.map('map').setView([latitude, longitude], 13);
-
-        // Adicionar o mapa base (OpenStreetMap)
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
-
-        // Adicionar marcador
-        const marker = L.marker([latitude, longitude]).addTo(map);
-
-        // Popup opcional
-        marker.bindPopup('<b>Campo Grande - MS</b><br>Latitude: ' + latitude + '<br>Longitude: ' + longitude).openPopup();
-    </script>
-{% endblock %}
+{% block scripts %}{% endblock %}

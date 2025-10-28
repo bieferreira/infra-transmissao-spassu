@@ -6,13 +6,14 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
+require __DIR__ . '/../../Service/IBGEService.php';
+require_once __DIR__ . '/../../Models/Antena/AntenaModel.php';
+
 $uri = (require __DIR__ . '/../../Core/request.php')();
 $uri = explode('/', $uri);
 $uri_rota = $uri[2] ?? '';
 $uri_rota = $uri_rota !== '' ? $uri_rota : 'listar';
 $id_antena = $uri[3] ?? '';
-
-require_once __DIR__ . '/../../Models/Antena/AntenaModel.php';
 
 // parâmetros consulta
 $page    = isset($_GET['page']) && (int)$_GET['page'] > 0 ? (int)$_GET['page'] : 1;
@@ -26,14 +27,14 @@ $options = [
     'uf'       => $uf,
 ];
 
-$allowed = '/^(atualizar|cadastrar|editar|excluir|listar|mapa|salvar|ver)$/';
+//upload permitidos
+$ext_allowed = ['jpg','png'];
 
 try {
-    $action = preg_match($allowed, $uri_rota, $match) ? $match[0] : '';
+    $action = preg_match(allowed(), $uri_rota, $match) ? $match[0] : '';
 
     echo match ($action) {
-        'atualizar' => (function () use ($id_antena) {
-
+        'atualizar' => (function () use ($id_antena, $ext_allowed) {
             $id = (int)$id_antena;
 
             if(!$id) {
@@ -48,15 +49,14 @@ try {
                 exit;
             }
 
-            $antena = antena_find($id);
-
-            if (!$antena) {
+            if (!antena_find($id)) {
                 http_response_code(404);
                 echo 'Antena não encontrada.';
                 exit;
             }
 
             $in = [
+                'id_antena'         => $id,
                 'descricao'        => trim((string)($_POST['descricao'] ?? '')),
                 'latitude'         => $_POST['latitude'] ?? null,
                 'longitude'        => $_POST['longitude'] ?? null,
@@ -71,7 +71,8 @@ try {
                 return APP_TWIG->render('/Antena/antena_form.twig', [
                             'titulo'        => 'Editar Antena',
                             'principal_url' => 'home',
-                            'antena'        => $antena,
+                            'antena'        => $in,
+                            'ufs'           => getUfOrdenado(),
                             'errors'        => $errors,
                         ]);
             }
@@ -79,53 +80,48 @@ try {
             // Remover foto atual?
             $remove = isset($_POST['remover_foto']) && $_POST['remover_foto'] === '1';
 
-            // Upload/Remoção mantendo coerência
-            $retorno_upoad = handle_upload($_FILES['foto'] ?? null, $antena['foto_path'] ?? null, $remove);
+            // Upload/Remoção
+            $retorno_upload = handle_upload($_FILES['foto'] ?? null, $antena['foto_path'] ?? '', $remove, $ext_allowed);
 
-            if (stripos($retorno_upoad, 'not-allowed') !== false) {
+            if (stripos($retorno_upload, 'ext-not-allowed') !== false) {
                 return APP_TWIG->render('/Antena/antena_form.twig', [
                     'titulo'        => 'Editar Antena',
                     'principal_url' => 'home',
-                    'antena'        => $antena,
-                    'flash_error'        => 'Tipo de arquivo não permitido, aceito apenas [JPG, PNG]',
+                    'antena'        => $in,
+                    'ufs'           => getUfOrdenado(),
+                    'flash_error'   => 'Tipo de arquivo não permitido, aceito apenas [ '.implode(' | ', $ext_allowed).' ]',
                 ]);
             }
 
-            $in['foto_path'] = $retorno_upoad;
+            $in['foto_path'] = $retorno_upload;
 
-            $ok = antena_update($id, $in);
-
-            $antena = antena_find($id);
-
-            if ($ok) {
+            if (antena_update($id, $in)) {
                 flash('success', 'Antena atualizada com sucesso!');
                 return APP_TWIG->render('/Antena/antena_form.twig', [
                     'titulo'        => 'Editar Antena',
                     'principal_url' => 'home',
-                    'antena'        => $antena,
+                    'antena'        => antena_find($id),
+                    'ufs'           => getUfOrdenado(),
                     'flash_success' => take_flash('success'),
                 ]);
             }
 
             flash('error', 'Falha ao atualizar antena.');
-            $_SESSION['old'] = $in;
-//            header('Location: ' . BASE_URL . '/antena/editar/' . $id);
-//            exit;
-
-            //$antena = antena_find($id);
-
             return APP_TWIG->render('/Antena/antena_form.twig', [
                 'titulo'        => 'Editar Antena',
                 'principal_url' => 'home',
-                'antena'        => $antena,
+                'antena'        => antena_find($id),
+                'ufs'           => getUfOrdenado(),
                 'flash_error'   => take_flash('error'),
             ]);
         })(),
         'cadastrar' => (function () {
-            return APP_TWIG->render('/Antena/antena_form.twig', [
-                'titulo'        => 'Cadastrar Antena',
-                'principal_url' => 'home',
-            ]);
+
+                return APP_TWIG->render('/Antena/antena_form.twig', [
+                    'titulo'        => 'Cadastrar Antena',
+                    'principal_url' => 'home',
+                    'ufs'           => getUfOrdenado(),
+                ]);
         })(),
         'editar' => (function () use ($id_antena) {
             $id_antena  = (int)$id_antena;
@@ -134,7 +130,8 @@ try {
                 return APP_TWIG->render('/Antena/antena_form.twig', [
                     'titulo'        => 'Editar Antena',
                     'principal_url' => 'home',
-                    'antena'       => $antena,
+                    'antena'        => $antena,
+                    'ufs'           => getUfOrdenado(),
                 ]);
 
         })(),
@@ -163,16 +160,13 @@ try {
             ]);
         })(),
         'mapa' => (function () use ($id_antena) {
-            $id_antena  = (int)$id_antena;
-            $antena = antena_find($id_antena);
-
             return APP_TWIG->render('/Antena/mapa.twig', [
                 'titulo'        => 'Ver Antena',
                 'principal_url' => 'home',
-                'antena'       => $antena,
+                'antena'        => antena_find((int)$id_antena),
             ]);
         })(),
-        'salvar' => (function () {
+        'salvar' => (function () use($ext_allowed) {
 
             if($_SERVER['REQUEST_METHOD'] !== 'POST') {
                 http_response_code(405);
@@ -195,22 +189,24 @@ try {
                 return APP_TWIG->render('/Antena/antena_form.twig', [
                     'titulo'        => 'Cadastrar Antena',
                     'principal_url' => 'home',
+                    'antena'        => $in,
                     'errors'        => $errors,
                 ]);
             }
 
             // Upload/Remoção mantendo coerência
-            $retorno_upoad = handle_upload($_FILES['foto'] ?? null, null, false);
+            $retorno_upload = handle_upload($_FILES['foto'] ?? null, '', false, $ext_allowed);
 
-            if (stripos($retorno_upoad, 'not-allowed') !== false) {
+            if (stripos($retorno_upload, 'ext-not-allowed') !== false) {
                 return APP_TWIG->render('/Antena/antena_form.twig', [
                     'titulo'        => 'Cadastrar Antena',
                     'principal_url' => 'home',
-                    'flash_error'        => 'Tipo de arquivo não permitido, aceito apenas [JPG, PNG]',
+                    'antena'        => $in,
+                    'flash_error'   => 'Tipo de arquivo não permitido, aceito apenas [ '.implode(' | ', $ext_allowed).' ]',
                 ]);
             }
 
-            $in['foto_path'] = $retorno_upoad;
+            $in['foto_path'] = $retorno_upload;
 
             $newId = antena_create($in);
 
@@ -271,12 +267,12 @@ function validate_antena(array $in): array
 
     $lat = $in['latitude'] ?? null;
     if ($lat === null || $lat === '' || !is_numeric($lat) || (float)$lat < -90 || (float)$lat > 90) {
-        $errors[] = 'Latitude inválida (entre -90 e 90).';
+        $errors[] = 'Latitude inválida (entre -90 e 90) e no máximo 7 casas decimais.';
     }
 
     $lon = $in['longitude'] ?? null;
     if ($lon === null || $lon === '' || !is_numeric($lon) || (float)$lon < -180 || (float)$lon > 180) {
-        $errors[] = 'Longitude inválida (entre -180 e 180).';
+        $errors[] = 'Longitude inválida (entre -180 e 180) e no máximo 7 casas decimais.';
     }
 
     $uf = trim((string)($in['uf'] ?? ''));
@@ -284,6 +280,11 @@ function validate_antena(array $in): array
         $errors[] = 'UF é obrigatória.';
     } elseif (strlen($uf) !== 2) {
         $errors[] = 'UF inválida.';
+    }
+
+    $alt = $in['altura'] ?? null;
+    if ($alt === null || $alt === '' || !is_numeric($alt) || (float)$alt <= 0) {
+        $errors[] = 'Altura inválida (exemplo 3,50).';
     }
 
     $data_implantacao = trim((string)($in['data_implantacao'] ?? ''));
@@ -317,7 +318,7 @@ function take_flash(string $type): ?string {
 /**
  * Trata upload opcional; retorna caminho relativo (ex.: /uploads/fotos_antenas/arquivo.jpg) ou null
  */
-function handle_upload(?array $file, ?string $existingPath = null, bool $removeFlag = false): ?string
+function handle_upload(?array $file, ?string $existingPath = '', bool $removeFlag = false, $allowed = ['jpg']): ?string
 {
     // Remover arquivo atual
     if ($removeFlag && $existingPath) {
@@ -336,10 +337,9 @@ function handle_upload(?array $file, ?string $existingPath = null, bool $removeF
     }
 
     $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-    $allowed = ['jpg','png'];
+//    $allowed = ['jpg','png'];
     if (!in_array($ext, $allowed, true)) {
-        //return $existingPath; // opcional: flash erro de tipo
-        return 'not-allowed';
+        return 'ext-not-allowed';
     }
 
     $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/fotos_antenas/';
@@ -379,4 +379,15 @@ function normalize_data(?string $v): ?string
 
     // Retorna no formato padronizado
     return $d->format('Y-m-d');
+}
+
+function getUfOrdenado() {
+    $estados = getEstadosIBGE();
+    usort($estados, fn($a, $b) => strcmp($a['sigla'], $b['sigla']));
+
+    return $estados;
+}
+
+function allowed(): string {
+    return $allowed = '/^(atualizar|cadastrar|editar|excluir|listar|mapa|salvar|ver)$/';
 }

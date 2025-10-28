@@ -118,3 +118,8 @@
 .card-header .btn-link:hover {
     text-decoration: none !important;
 }
+
+.td-actions {
+    white-space: nowrap !important;
+    width: 1%;
+}
