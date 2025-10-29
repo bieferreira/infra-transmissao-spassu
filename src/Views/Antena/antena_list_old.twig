@@ -1,0 +1,42 @@
+{% extends 'base.twig' %}
+
+{% block content %}
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h1 class="h4 mb-0">Antenas</h1>
+        <a class="btn btn-primary" href="{{ BASE_URL }}antena/novo">Nova Antena</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Descrição</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th class="text-end">Ações</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if antenas is not empty %}
+                {% for a in antenas %}
+                    <tr>
+                        <td>{{ a.id_antena }}</td>
+                        <td>{{ a.descricao }}</td>
+                        <td>{{ a.latitude }}</td>
+                        <td>{{ a.longitude }}</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-secondary" href="{{ BASE_URL }}antena/ver?id={{ a.id_antena }}">Ver</a>
+                            <a class="btn btn-sm btn-outline-primary"   href="{{ BASE_URL }}antena/editar?id={{ a.id_antena }}">Editar</a>
+                            <a class="btn btn-sm btn-outline-danger"    href="{{ BASE_URL }}antena/excluir?id={{ a.id_antena }}"
+                               onclick="return confirm('Confirma excluir esta antena?');">Excluir</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr><td colspan="5" class="text-center text-muted">Nenhuma antena encontrada.</td></tr>
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ SITE_NAME | default('Infraestrutura de Transmissão Default') }}</title>
+    <link href="{{ ASSETS_URL }}/css/bootstrap.css" rel="stylesheet" />
+    {% if css_extra is defined %}
+        <link rel="stylesheet" href="{{ css_extra }}" />
+    {% endif %}
+</head>
+<body>
+<!-- Header / Navbar -->
+<header class="border-bottom">
+    <nav class="navbar navbar-expand-lg bg-white">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{{ principal_url | default('#') }}">
+                <img src="{{ logo_src | default(ASSETS_URL ~ '/img/logo.svg') }}" alt="Logo" height="36" class="me-2"/>
+                <span class="fw-sem5bold">Infraestrutura de Transmissão</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    {% set menu = [
+                        {href: 'principal.html', label: 'Início'},
+                        {href: 'app/view/assuntoGrid.php', label: 'Assunto'},
+                        {href: 'app/view/autorGrid.php', label: 'Autor'},
+                        {href: 'app/view/livroGrid.php', label: 'Livro'},
+                        {href: 'relatorio/autor_livros_assuntos/autor_livros_assuntos.php', label: 'Relatório', target: '_blank'}
+                    ] %}
+                    {% for item in (menu_override is defined and menu_override ? menu_override : menu) %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ item.href }}" {% if item.target is defined %}target="{{ item.target }}"{% endif %}>{{ item.label }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<!-- Main / Hero -->
+<main>
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="row align-items-center g-4">
+                <div class="col-12 col-lg-6">
+                    <h1 class="display-5 fw-bold mb-3">
+                        Acesso às principais bibliografias para o
+                        <br class="d-none d-md-block" />
+                        seu conhecimento
+                    </h1>
+                    <p class="lead text-muted">
+                        Tenha com facilidade acesso aos conteúdos mais variados
+                        <br class="d-none d-md-inline" />
+                        a um preço simbólico...
+                    </p>
+                </div>
+                <div class="col-12 col-lg-6">
+                    <div class="row g-3">
+                        {% set imgs = images is defined and images ? images : [
+                            'assets/img/home1.jpeg',
+                            'assets/img/home2.jpeg',
+                            'assets/img/home3.jpeg'
+                        ] %}
+                        {% for src in imgs %}
+                            <div class="col-4">
+                                <img src="{{ src }}" class="img-fluid rounded shadow-sm" alt="Imagem {{ loop.index }}" />
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Footer -->
+<footer class="py-4 border-top bg-white">
+    <div class="container text-center small text-muted">
+        © {{ ano | default('2025') }} Infraestrutura de Transmissão. Todos os direitos reservados.
+    </div>
+</footer>
+
+<script src="{{ ASSETS_URL }}/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

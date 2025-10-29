@@ -1,0 +1,35 @@
+services:
+  php-apache:
+    container_name: InfraTransmissaoSpassuServerWeb
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "9090:80"
+    volumes:
+      - .:/var/www/html
+    command: /bin/bash -c "chmod -R 777 /var/www/html/public/uploads && apache2-foreground"
+    networks:
+      - infratransmissaonetwork
+
+  mysql:
+    image: mysql:8.0
+    container_name: InfraTransmissaoSpassuMysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 1nfr4Sp4ssu
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_DATABASE: infratransmissao
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 1nfr4Sp4ssu
+      MYSQL_PORT: 3308
+    volumes:
+      - ../data_transmissao/mysql/:/var/lib/mysql
+    restart: always
+    ports:
+      - "3308:3306"
+    networks:
+      - infratransmissaonetwork
+      
+networks:
+  infratransmissaonetwork:
+    external: true

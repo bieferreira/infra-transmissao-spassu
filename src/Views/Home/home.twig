@@ -1,0 +1,29 @@
+{% extends 'base.twig' %}
+
+{% block content %}
+    <section class="container py-5">
+        <div class="row align-items-start g-5">
+            <div class="col-12 col-lg-6">
+                <span class="badge text-bg-secondary mb-3">{{ SITE_NAME }}</span>
+                <h1 class="display-5 fw-bold mb-3 lh-sm color-1">
+                    Administração da estrutura de responsabilidade ANATEL
+                </h1>
+                <p class="lead text-muted mb-4">
+                    Acesso facilitado às principais funcionalidades do sistema.
+                </p>
+
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{{ BASE_URL }}/antena"
+                       class="btn btn-primary btn-lg px-4">
+                        Antenas
+                    </a>
+                    <a href="{{ BASE_URL }}/servicos"
+                       class="btn btn-outline-secondary btn-lg px-4">
+                        Ver mais
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+{% endblock %}

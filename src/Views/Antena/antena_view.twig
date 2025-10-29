@@ -1,0 +1,125 @@
+{% extends "base.twig" %}
+
+{% block title %}{{ titulo | default('Ver Antena') }}{% endblock %}
+
+{% block styles %}{% endblock %}
+
+{% block content %}
+    <div class="container py-4 bg-white">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h2 class="mb-0 color-1">{{ titulo | default('Ver Antena') }}</h2>
+            </div>
+
+            <div class="d-flex gap-2">
+                <a href="{{ BASE_URL }}/antena/editar/{{ antena.id_antena }}" class="btn btn-outline-warning">
+                    <i class="bi bi-pencil-square"></i> Editar
+                </a>
+                <a href="{{ BASE_URL }}/antena/excluir/{{ antena.id_antena }}"
+                   class="btn btn-outline-danger"
+                   onclick="return confirm('Deseja realmente excluir esta antena?')">
+                    <i class="bi bi-trash"></i> Excluir
+                </a>
+                <a href="{{ BASE_URL }}/antena" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+            </div>
+        </div>
+
+        <div class="card card-full mt-5 mb-3">
+            <div class="card-header color-3">
+                <strong>Detalhes da Antena</strong>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 col-md-3 meta-label">Descrição</dt>
+                    <dd class="col-sm-8 col-md-9">{{ antena.descricao }}</dd>
+
+                    <dt class="col-sm-4 col-md-3 meta-label">UF</dt>
+                    <dd class="col-sm-8 col-md-9">
+                        {{ antena.uf }}{% if antena.uf_descricao %} — {{ antena.uf_descricao }}{% endif %}
+                    </dd>
+
+                    <dt class="col-sm-4 col-md-3 meta-label">Altura</dt>
+                    <dd class="col-sm-8 col-md-9">{{ antena.altura|number_format(2, ',', '.') }}</dd>
+
+                    {% set implantacao = antena.data_implantacao | default(antena.data_impantacao) %}
+                    <dt class="col-sm-4 col-md-3 meta-label">Implantação</dt>
+                    <dd class="col-sm-8 col-md-9">{{ implantacao | date('d/m/Y') }}</dd>
+
+                    <dt class="col-sm-4 col-md-3 meta-label">Latitude</dt>
+                    <dd class="col-sm-8 col-md-9">{{ antena.latitude|number_format(7, ',', '.') }}</dd>
+
+                    <dt class="col-sm-4 col-md-3 meta-label">Longitude</dt>
+                    <dd class="col-sm-8 col-md-9">{{ antena.longitude|number_format(7, ',', '.') }}</dd>
+
+                </dl>
+            </div>
+        </div>
+
+        <div class="card mt-5 mb-3">
+            <div class="card-header p-0">
+                <button class="btn btn-link w-100 text-start px-3 py-2 d-flex align-items-center color-3"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#mapaantena"
+                        aria-expanded="true"
+                        aria-controls="mapaantena">
+                    <strong>Mapa</strong>
+                    <span class="ms-auto toggle-caret" aria-hidden="true">▼</span>
+                </button>
+            </div>
+            <div id="mapaantena" class="collapse hidden">
+            <div class="card-body p-0">
+                <iframe
+                        id="iframeAntenaMapa"
+                        name="iframeAntenaMapa"
+                        src="{{ BASE_URL }}/antena/mapa/{{ antena.id_antena }}"
+                        class="w-100 border rounded"
+                        style="height: 520px;">
+                </iframe>
+            </div>
+            <div class="card-footer d-flex flex-wrap gap-2">
+                <a class="btn btn-sm btn-outline-primary"
+                   href="https://www.google.com/maps/search/?api=1&query={{ antena.latitude }},{{ antena.longitude }}"
+                   target="_blank" rel="noopener">
+                    Abrir no Google Maps
+                </a>
+                <a class="btn btn-sm btn-outline-secondary"
+                   href="https://www.openstreetmap.org/?mlat={{ antena.latitude }}&mlon={{ antena.longitude }}#map=18/{{ antena.latitude }}/{{ antena.longitude }}"
+                   target="_blank" rel="noopener">
+                    Abrir no OSM
+                </a>
+            </div>
+            </div>
+        </div>
+
+        <div class="card mt-5 mb-3">
+            <div class="card-header p-0">
+                <button class="btn btn-link w-100 text-start px-3 py-2 d-flex align-items-center color-3"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#fotoantena"
+                        aria-expanded="true"
+                        aria-controls="fotoantena">
+                    <strong>Foto</strong>
+                    <span class="ms-auto toggle-caret" aria-hidden="true">▼</span>
+                </button>
+            </div>
+            <div id="fotoantena" class="collapse hidden">
+                <div class="card-body p-2">
+                    {% if antena.foto_path is not empty %}
+                        <img src="{{ antena.foto_path }}" alt="Foto da antena" class="img-fluid rounded thumb-fit">
+                    {% else %}
+                        <p class="text-muted small">Sem foto disponível</p>
+                    {% endif %}
+                </div>
+            </div>
+
+    </div>
+    <br><br>
+    </div>
+{% endblock %}
+
+{% block scripts %}{% endblock %}
