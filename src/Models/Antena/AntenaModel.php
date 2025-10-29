@@ -16,10 +16,10 @@ function getAntenaRankingUf(PDO $pdo, int $limit = 5): array
         ORDER BY total DESC
         LIMIT :limit
     SQL;
-
-    try {
         $stmt = $pdo->prepare($sql);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+
+    try {
         $stmt->execute();
     } catch (PDOException $e) {
         if (defined('APP_ENV') && APP_ENV === 'dev') {
@@ -41,15 +41,18 @@ function getAntenaRankingUf(PDO $pdo, int $limit = 5): array
  *   'uf' => 'MS'              // filtra por UF
  * ]
  */
-function antena_list(array $options = []): array
+//function antena_list(array $options = []): array
+function getAntenaList(PDO $pdo, $options): array
 {
-    $page     = isset($options['page']) && (int)$options['page'] > 0 ? (int)$options['page'] : 1;
-    $perPage  = isset($options['per_page']) && (int)$options['per_page'] > 0 ? (int)$options['per_page'] : 10;
-    $search   = isset($options['search']) ? trim((string)$options['search']) : '';
-    $uf       = isset($options['uf']) ? strtoupper(trim((string)$options['uf'])) : '';
+    $page     = $options['page'];
+    $perPage  = $options['per_page'];
+    $search   = $options['search'];
+    $uf       = $options['uf'];
 
+    $offset = ($page - 1) * $perPage;
     $where  = [];
     $params = [];
+
 
     if ($search !== '') {
         $where[] = 'a.descricao LIKE :search';
@@ -61,17 +64,28 @@ function antena_list(array $options = []): array
         $params[':uf'] = $uf;
     }
 
-    $sql = "SELECT a.id_antena, a.descricao, a.latitude, a.longitude, a.uf, a.data_implantacao, a.altura 
-            FROM antenas a  WHERE excluido = '0' ";
+    $sql = <<<SQL
+    SELECT 
+        a.id_antena, 
+        a.descricao, 
+        a.latitude, 
+        a.longitude, 
+        a.uf, 
+        a.data_implantacao, 
+        a.altura 
+    FROM antenas a  
+    WHERE excluido = '0'
+    SQL;
 
     if ($where) {
-        $sql .= " AND " . implode(' AND ', $where);
+        $sql .= ' AND ' . implode(' AND ', $where);
     }
 
-    $sql .= ' ORDER BY a.id_antena DESC
-              LIMIT :limit OFFSET :offset';
+    $sql .= <<<SQL
+        ORDER BY a.id_antena DESC
+        LIMIT :limit OFFSET :offset
+    SQL;
 
-    $pdo = db();
     $stmt = $pdo->prepare($sql);
 
     // bind dos filtros
@@ -81,10 +95,20 @@ function antena_list(array $options = []): array
 
     // paginação
     $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
-    $stmt->bindValue(':offset', ($page - 1) * $perPage, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 
-    $stmt->execute();
-    return $stmt->fetchAll();
+    try {
+        $stmt->execute();
+    } catch (PDOException $e) {
+        if (defined('APP_ENV') && APP_ENV === 'dev') {
+            die('Erro ao conectar a tabela antena: ' . htmlspecialchars($e->getMessage()));
+        } else {
+            die('Falha de conexão com a tabela.');
+        }
+    }
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 }
 
 /**
