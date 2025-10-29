@@ -27,6 +27,7 @@
     "twig/twig": "^3.0",
     "twbs/bootstrap": "^5.3",
     "ext-crl": "*",
-    "ext-curl": "*"
+    "ext-curl": "*",
+    "ext-pdo": "*"
   }
 }

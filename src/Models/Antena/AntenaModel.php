@@ -2,31 +2,34 @@
 
 require_once __DIR__ . '/../../db.php';
 
-/**
- * Lista top 5 antenas por estado
- * Ex.: [['uf' => 'SP', 'total' => 1234], ...]
- */
-function antena_top_ufs(int $limit = 5): array
+function getAntenaRankingUf(PDO $pdo, int $limit = 5): array
 {
-    $pdo = db();
-    // Cast no $limit para evitar problemas com LIMIT parametrizado
-    $limit = max(1, (int)$limit);
+    $sql = <<<SQL
+        SELECT 
+            a.uf,
+            e.uf_descricao, 
+            COUNT(*) AS total
+        FROM antenas AS a
+        INNER JOIN estados AS e ON e.uf = a.uf
+        WHERE a.excluido = '0'
+        GROUP BY a.uf, e.uf_descricao
+        ORDER BY total DESC
+        LIMIT :limit
+    SQL;
 
-    $sql = "SELECT 
-        a.uf, 
-        e.uf_descricao, 
-        COUNT(*) AS total
-    FROM antenas AS a
-    INNER JOIN estados AS e ON e.uf = a.uf
-    WHERE excluido = '0' 
-    GROUP BY a.uf, e.uf_descricao
-    ORDER BY total DESC
-    LIMIT {$limit};
-    ";
+    try {
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+    } catch (PDOException $e) {
+        if (defined('APP_ENV') && APP_ENV === 'dev') {
+            die('Erro ao conectar as tabelas antenas ou estados: ' . htmlspecialchars($e->getMessage()));
+        } else {
+            die('Falha de conexão com as tabelas.');
+        }
+    }
 
-
-    $stmt = $pdo->query($sql);
-    return $stmt->fetchAll();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 /**

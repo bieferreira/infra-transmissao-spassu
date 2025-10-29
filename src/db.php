@@ -2,7 +2,6 @@
 
 function db(): PDO
 {
-
     static $pdo = null;
 
     if ($pdo instanceof PDO) {
@@ -17,10 +16,22 @@ function db(): PDO
 
     $dsn  = "mysql:host={$host};port={$port};dbname={$db};charset=utf8mb4";
 
-    $pdo = new PDO($dsn, $user, $pass, [
-        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]);
+    try {
+        $pdo = new PDO($dsn, $user, $pass, [
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        ]);
+
+        $pdo->query('SELECT 1');
+
+    } catch (PDOException $e) {
+
+        if (defined('APP_ENV') && APP_ENV === 'dev') {
+            die('Erro ao conectar ao banco: ' . htmlspecialchars($e->getMessage()));
+        } else {
+            die('Falha de conexão com o banco de dados.');
+        }
+    }
 
     return $pdo;
 }

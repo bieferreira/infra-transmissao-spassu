@@ -1,0 +1,72 @@
+# ===================================
+# 🧠 GERAIS
+# ===================================
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+error_log
+
+# Backup / temporários
+*.bak
+*.tmp
+*.swp
+
+# ===================================
+# 🐘 PHP / Composer
+# ===================================
+vendor/
+composer.lock
+
+# Arquivos de cache / build
+.cache/
+build/
+coverage/
+.phpunit.result.cache
+
+# ===================================
+# ⚙️ PhpStorm / JetBrains
+# ===================================
+.idea/
+*.iml
+
+# ===================================
+# 🐳 Docker
+# ===================================
+.docker
+docker-compose.override.yml
+.env
+.env.local
+.env.*.local
+dbdata/
+docker/mysql
+docker-data/
+tmp/
+
+# ===================================
+# 🧪 Testes / Ferramentas
+# ===================================
+phpunit.xml
+phpunit.xml.dist
+phpstan.neon
+phpstan.neon.dist
+phpstan.cache
+.psalm/
+.psalm.cache
+
+# ===================================
+# 📦 Node / Front-end (caso use)
+# ===================================
+node_modules/
+dist/
+npm-debug.log
+yarn-debug.log*
+yarn-error.log*
+
+# ===================================
+# 🧱 IDEs / Editores
+# ===================================
+.vscode/

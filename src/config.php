@@ -11,17 +11,25 @@ $twig = new \Twig\Environment($loader, [
     'debug' => true,
 ]);
 
-const BASE_URL   = '';
-const ASSETS_URL = BASE_URL . '/assets';
-const SITE_NAME  = 'Infraestrutura de Trânsmissão';
+// === App ===
+define('APP_ENV', 'dev');
+define('SITE_NAME', 'Infraestrutura de Trânsmissão');
+
+// === Paths ===
+define('BASE_URL', '');
+define('ASSETS_URL', BASE_URL . '/assets');
+
+// === Banco de Dados ===
+define('DB_HOST', 'InfraSpassuMysql');
+define('DB_PORT', '3306');
+define('DB_NAME', 'infratransmissao');
+define('DB_USER', 'user');
+define('DB_PASS', '1nfr4Sp4ssu');
+
+// === Sessão / Usuário ===
+define('ID_USUARIO', 1);
 
 define('APP_TWIG', $twig);
-const DB_HOST = 'InfraTransmissaoSpassuMysql';
-const DB_PORT = '3306';
-const DB_NAME = 'infratransmissao';
-const DB_USER = 'user';
-const DB_PASS = '1nfr4Sp4ssu';
-const ID_USUARIO = 1;
 
 $globals = [
     'BASE_URL'   => BASE_URL,
@@ -32,5 +40,3 @@ $globals = [
 foreach ($globals as $key => $value) {
     $twig->addGlobal($key, $value);
 }
-
-//return $twig;

@@ -5,8 +5,9 @@ declare(strict_types=1);
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
-require __DIR__ . '/../../Service/IBGEService.php';
+
 require_once __DIR__ . '/../../Models/Antena/AntenaModel.php';
+require __DIR__ . '/../../Service/IBGEService.php';
 
 $uri = (require __DIR__ . '/../../Core/request.php')();
 $uri = explode('/', $uri);
@@ -14,6 +15,7 @@ $uri_rota = $uri[2] ?? '';
 $uri_rota = $uri_rota !== '' ? $uri_rota : 'listar';
 $id_antena = $uri[3] ?? '';
 
+$pdo = db();
 //upload permitidos
 $ext_allowed = ['jpg','png'];
 //total ufs maior incidencia
@@ -25,7 +27,7 @@ try {
     $action = preg_match(allowed(), $uri_rota, $match) ? $match[0] : '';
 
     echo match ($action) {
-        'atualizar' => (function () use ($id_antena, $ext_allowed) {
+        'atualizar' => (function () use ($pdo, $id_antena, $ext_allowed) {
             $id = (int)$id_antena;
 
             if(!$id) {
@@ -128,7 +130,7 @@ try {
                 ]);
 
         })(),
-        'excluir' => (function () use ($id_antena, $rank, $per_page) {
+        'excluir' => (function () use ($pdo, $id_antena, $rank, $per_page) {
             $id = (int)$id_antena;
 
             if (!$id) {
@@ -160,7 +162,7 @@ try {
                 return APP_TWIG->render('/Antena/antena_list.twig', [
                     'titulo'        => 'Lista de Antenas',
                     'principal_url' => 'home',
-                    'ranking_ufs'   => antena_top_ufs($rank),
+                    'ranking_ufs'   => getAntenaRankingUf($pdo, $rank),
                     'antenas'       => antena_list($params['options']),
                     'page'          => $params['page'],
                     'total'         => $params['total'],
@@ -177,7 +179,7 @@ try {
                 return APP_TWIG->render('/Antena/antena_list.twig', [
                     'titulo'        => 'Listar Antenas',
                     'principal_url' => 'home',
-                    'ranking_ufs'   => antena_top_ufs($rank),
+                    'ranking_ufs'   => getAntenaRankingUf($pdo, $rank),
                     'antenas'       => antena_list($params['options']),
                     'page'          => $params['page'],
                     'total'         => $params['total'],
@@ -191,14 +193,14 @@ try {
             }
 
         })(),
-        'listar' => (function () use ($rank, $per_page) {
+        'listar' => (function () use ($pdo, $rank, $per_page) {
 
             $params = getParametroConsulta($per_page);
 
             return APP_TWIG->render('/Antena/antena_list.twig', [
                 'titulo'        => 'Lista de Antenas',
                 'principal_url' => 'home',
-                'ranking_ufs'  => antena_top_ufs($rank),
+                'ranking_ufs'  => getAntenaRankingUf($pdo, $rank),
                 'antenas'  => antena_list($params['options']),
                 'page'     => $params['page'],
                 'total'    => $params['total'],
