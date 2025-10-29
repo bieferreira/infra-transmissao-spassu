@@ -114,10 +114,10 @@ function getAntenaList(PDO $pdo, $options): array
 /**
  * Total de antenas (para paginação) respeitando os mesmos filtros.
  */
-function antena_count(array $options = []): int
+function getAntenaCount(PDO $pdo, array $options): int
 {
-    $search = isset($options['search']) ? trim((string)$options['search']) : '';
-    $uf     = isset($options['uf']) ? strtoupper(trim((string)$options['uf'])) : '';
+    $search = $options['search'];
+    $uf     = $options['uf'];
 
     $where  = [];
     $params = [];
@@ -132,22 +132,37 @@ function antena_count(array $options = []): int
         $params[':uf'] = $uf;
     }
 
-    $sql = "SELECT COUNT(*) AS total FROM antenas WHERE excluido = '0' ";
+    $sql = <<<SQL
+        SELECT 
+            COUNT(*) AS total 
+        FROM antenas 
+        WHERE excluido = '0'
+    SQL;
+
     if ($where) {
         $sql .= " AND " . implode(' AND ', $where);
     }
 
-    $pdo = db();
     $stmt = $pdo->prepare($sql);
 
+    // bind dos filtros
     foreach ($params as $k => $v) {
         $stmt->bindValue($k, $v, PDO::PARAM_STR);
     }
 
-    $stmt->execute();
-    $row = $stmt->fetch();
+    try {
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        if (defined('APP_ENV') && APP_ENV === 'dev') {
+            die('Erro ao conectar a tabela antena count: ' . htmlspecialchars($e->getMessage()));
+        } else {
+            die('Falha de conexão com a tabela.');
+        }
+    }
 
-    return $row ? (int)$row['total'] : 0;
+    return (int)$row['total'];
+
 }
 
 /**

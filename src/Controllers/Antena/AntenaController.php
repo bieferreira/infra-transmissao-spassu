@@ -154,7 +154,7 @@ try {
                 }
             }
 
-            $params = getParametroConsulta($per_page);
+            $params = getParametroConsulta($pdo, $per_page);
 
             if (antena_delete($id)) {
                 flash('success', 'Antena excluída com sucesso!');
@@ -195,7 +195,7 @@ try {
         })(),
         'listar' => (function () use ($pdo, $rank, $per_page) {
 
-            $params = getParametroConsulta($per_page);
+            $params = getParametroConsulta($pdo, $per_page);
 
             return APP_TWIG->render('/Antena/antena_list.twig', [
                 'titulo'        => 'Lista de Antenas',
@@ -445,7 +445,7 @@ function allowed(): string {
     return $allowed = '/^(atualizar|cadastrar|editar|excluir|listar|mapa|salvar|ver)$/';
 }
 
-function getParametroConsulta($per_page){
+function getParametroConsulta($pdo, $per_page){
     // parâmetros consulta
     $page    = isset($_GET['page']) && (int)$_GET['page'] > 0 ? (int)$_GET['page'] : 1;
     $search  = isset($_GET['q']) ? (string)$_GET['q'] : '';
@@ -459,7 +459,7 @@ function getParametroConsulta($per_page){
         'uf'       => $uf,
     ];
 
-    $total   = antena_count($options);
+    $total   = getAntenaCount($pdo, $options);
     $pages   = (int)ceil($total / $per_page);
 
     return compact('page', 'search', 'uf', 'options', 'total', 'pages');
