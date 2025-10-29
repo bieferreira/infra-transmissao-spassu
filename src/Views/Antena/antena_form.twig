@@ -62,6 +62,8 @@
                 class="needs-validation js-sync-url"
                 novalidate
         >
+            <input type="hidden" name="id_antena" value="{{ old.id_antena | default(antena.id_antena) }}">
+
             {# CSRF opcional #}
             {% if csrf is defined %}
                 <input type="hidden" name="_csrf" value="{{ csrf }}">

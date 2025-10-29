@@ -14,6 +14,7 @@ $uri = explode('/', $uri);
 $uri_rota = $uri[2] ?? '';
 $uri_rota = $uri_rota !== '' ? $uri_rota : 'listar';
 $id_antena = $uri[3] ?? '';
+$id_antena = (int)$id_antena;
 
 $pdo = db();
 //upload permitidos
@@ -28,7 +29,7 @@ try {
 
     echo match ($action) {
         'atualizar' => (function () use ($pdo, $id_antena, $ext_allowed) {
-            $id = (int)$id_antena;
+            $id = $id_antena;
 
             if(!$id) {
                 http_response_code(400);
@@ -113,25 +114,53 @@ try {
             ]);
         })(),
         'cadastrar' => (function () {
+            $old = [];
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $old = $_POST;
+            }
 
                 return APP_TWIG->render('/Antena/antena_form.twig', [
                     'titulo'        => 'Cadastrar Antena',
                     'principal_url' => 'home',
+                    'old'           => $old,
                     'ufs'           => getUfOrdenado(),
                 ]);
         })(),
         'editar' => (function () use ($id_antena) {
+            if ($id_antena <= 0) {
+                flash('success', 'Antena não definida.');
+                return APP_TWIG->render('/Antena/antena_list.twig', [
+                    'titulo'        => 'Listar Antenas',
+                    'principal_url' => 'home',
+                    'flash_error'   => take_flash('error'),
+                    'redir_msg'     => '../listar',
+                ]);
+            }
 
-                return APP_TWIG->render('/Antena/antena_form.twig', [
+            $old = [];
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $old = $_POST;
+            }
+
+            if (($old['id_antena'] ?? 0) > 0) {
+                $antena = array_intersect_key(antena_find($id_antena), array_flip(['id_antena']));
+            } else {
+                unset($old['old']);
+                $antena = antena_find($id_antena);
+            }
+
+            return APP_TWIG->render('/Antena/antena_form.twig', [
                     'titulo'        => 'Editar Antena',
                     'principal_url' => 'home',
-                    'antena'        => antena_find((int)$id_antena),
+                    'old'           => $old,
+                    'antena'        => $antena,
                     'ufs'           => getUfOrdenado(),
-                ]);
+                    'redir_msg'     => '../listar',
+            ]);
 
         })(),
         'excluir' => (function () use ($pdo, $id_antena, $rank, $per_page) {
-            $id = (int)$id_antena;
+            $id = $id_antena;
 
             if (!$id) {
                 http_response_code(400);
@@ -213,7 +242,7 @@ try {
             return APP_TWIG->render('/Antena/mapa.twig', [
                 'titulo'        => 'Ver Antena',
                 'principal_url' => 'home',
-                'antena'        => antena_find((int)$id_antena),
+                'antena'        => antena_find($id_antena),
             ]);
         })(),
         'salvar' => (function () use($ext_allowed) {
@@ -287,7 +316,7 @@ try {
             return APP_TWIG->render('/Antena/antena_view.twig', [
                 'titulo'        => 'Ver Antena',
                 'principal_url' => 'home',
-                'antena'       => antena_find((int)$id_antena),
+                'antena'       => antena_find($id_antena),
             ]);
         })(),
         default => APP_TWIG->render('/404/404.twig'),
