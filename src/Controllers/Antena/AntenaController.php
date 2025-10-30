@@ -8,13 +8,14 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 
 require_once __DIR__ . '/../../Models/Antena/AntenaModel.php';
 require __DIR__ . '/../../Service/IBGEService.php';
+require __DIR__ . '/../../Service/HashidService.php';
+require_once __DIR__ . '/../../Core/csrf.php';
 
 $uri = (require __DIR__ . '/../../Core/request.php')();
 $uri = explode('/', $uri);
 $uri_rota = $uri[2] ?? '';
 $uri_rota = $uri_rota !== '' ? $uri_rota : 'listar';
 $id_antena = $uri[3] ?? '';
-$id_antena = (int)$id_antena;
 
 $pdo = db();
 //upload permitidos
@@ -28,14 +29,7 @@ try {
     $action = preg_match(allowed(), $uri_rota, $match) ? $match[0] : '';
 
     echo match ($action) {
-        'atualizar' => (function () use ($pdo, $id_antena, $ext_allowed) {
-            $id = $id_antena;
-
-            if(!$id) {
-                http_response_code(400);
-                echo 'ID inválido.';
-                exit;
-            }
+        'atualizar' => (function () use ($pdo, $id_antena, $per_page, $rank, $ext_allowed) {
 
             if($_SERVER['REQUEST_METHOD'] !== 'POST') {
                 http_response_code(405);
@@ -43,7 +37,44 @@ try {
                 exit;
             }
 
-            if (!antena_find($id)) {
+            if(!verifyCsrfToken($_POST['csrf_token_form'])) {
+                http_response_code(403);
+                echo 'Por motivos de segurança, sua sessão expirou. Recarregue a página e tente novamente.';
+                exit;
+            }
+
+            $old = [];
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $old = $_POST;
+            }
+
+            if ($id_antena === '' && ($old['id_antena'] ?? '') === '') {
+                $params = getParametroConsulta($pdo, $per_page);
+
+                flash('error', 'Não foi possível localizar a antena.');
+                return APP_TWIG->render('/Antena/antena_list.twig', [
+                    'titulo'        => 'Lista de Antenas',
+                    'principal_url' => 'home',
+                    'csrf'          => getCsrfToken(),
+                    'ranking_ufs'   => getAntenaRankingUf($pdo, $rank),
+                    'antenas'       => getAntenaList($pdo, $params['options']),
+                    'page'          => $params['page'],
+                    'total'         => $params['total'],
+                    'pages'         => $params['pages'],
+                    'q'             => $params['search'],
+                    'uf'            => $params['uf'],
+                    'flash_error'   => take_flash('error'),
+                    'redir_msg'     => 'listar',
+                ]);
+            }
+
+            if($id_antena === '') {
+                $id_antena = $old['id_antena'];
+            }
+
+            $id = $id_antena;
+
+            if (!getAntenaFindId($pdo, $id)) {
                 http_response_code(404);
                 echo 'Antena não encontrada.';
                 exit;
@@ -68,7 +99,7 @@ try {
                             'antena'        => $in,
                             'ufs'           => getUfOrdenado(),
                             'errors'        => $errors,
-                            'redir_msg'     => '../editar/'.$id,
+                            'redir_msg'     => 'editar',
                         ]);
             }
 
@@ -84,33 +115,33 @@ try {
                     'principal_url' => 'home',
                     'antena'        => $in,
                     'ufs'           => getUfOrdenado(),
-                    'flash_error'   => 'Tipo de arquivo não permitido, aceito apenas [ '.implode(' | ', $ext_allowed).' ]',
-                    'redir_msg'     => '../editar/'.$id,
+                    'flash_error'   => 'Tipo de arquivo não permitido, aceito apenas <br>[ '.implode(' | ', $ext_allowed).' ]',
+                    'redir_msg'     => 'editar',
                 ]);
             }
 
             $in['foto_path'] = $retorno_upload;
 
-            if (antena_update($id, $in)) {
+            if (antena_update($pdo, $id, $in)) {
                 flash('success', 'Antena atualizada com sucesso!');
                 return APP_TWIG->render('/Antena/antena_form.twig', [
                     'titulo'        => 'Editar Antena',
                     'principal_url' => 'home',
-                    'antena'        => antena_find($id),
+                    'antena'        => getAntenaFindId($pdo, $id),
                     'ufs'           => getUfOrdenado(),
                     'flash_success' => take_flash('success'),
-                    'redir_msg'     => '../editar/'.$id,
+                    'redir_msg'     => 'editar',
                 ]);
             }
 
-            flash('error', 'Falha ao atualizar antena, verifique Descrição existente.');
+            flash('error', 'Falha ao atualizar antena, verifique Descrição já existente.');
             return APP_TWIG->render('/Antena/antena_form.twig', [
                 'titulo'        => 'Editar Antena',
                 'principal_url' => 'home',
-                'antena'        => antena_find($id),
+                'antena'        => getAntenaFindId($pdo, $id),
                 'ufs'           => getUfOrdenado(),
                 'flash_error'   => take_flash('error'),
-                'redir_msg'     => '../editar/'.$id,
+                'redir_msg'     => 'editar',
             ]);
         })(),
         'cadastrar' => (function () {
@@ -122,36 +153,51 @@ try {
                 return APP_TWIG->render('/Antena/antena_form.twig', [
                     'titulo'        => 'Cadastrar Antena',
                     'principal_url' => 'home',
+                    'csrf'          => getCsrfToken(),
                     'old'           => $old,
                     'ufs'           => getUfOrdenado(),
                 ]);
         })(),
-        'editar' => (function () use ($id_antena) {
-            if ($id_antena <= 0) {
-                flash('success', 'Antena não definida.');
-                return APP_TWIG->render('/Antena/antena_list.twig', [
-                    'titulo'        => 'Listar Antenas',
-                    'principal_url' => 'home',
-                    'flash_error'   => take_flash('error'),
-                    'redir_msg'     => '../listar',
-                ]);
-            }
-
+        'editar' => (function () use ($pdo, $id_antena, $per_page, $rank) {
             $old = [];
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $old = $_POST;
             }
 
-            if (($old['id_antena'] ?? 0) > 0) {
-                $antena = array_intersect_key(antena_find($id_antena), array_flip(['id_antena']));
+            if ($id_antena === '' && ($old['id_antena'] ?? '') === '') {
+                $params = getParametroConsulta($pdo, $per_page);
+
+                flash('error', 'Não foi possível localizar a antena.');
+                return APP_TWIG->render('/Antena/antena_list.twig', [
+                    'titulo'        => 'Lista de Antenas',
+                    'principal_url' => 'home',
+                    'csrf'          => getCsrfToken(),
+                    'ranking_ufs'   => getAntenaRankingUf($pdo, $rank),
+                    'antenas'       => getAntenaList($pdo, $params['options']),
+                    'page'          => $params['page'],
+                    'total'         => $params['total'],
+                    'pages'         => $params['pages'],
+                    'q'             => $params['search'],
+                    'uf'            => $params['uf'],
+                    'flash_error'   => take_flash('error'),
+                    'redir_msg'     => 'listar',
+                ]);
+            }
+
+            if($id_antena === '') {
+                $id_antena = $old['id_antena'];
+            }
+
+            if (($old['id_antena'] ?? '') !== '' && ($old['form_name'] ?? '') !== 'frm_hidden') {
+                $antena = array_intersect_key(getAntenaFindId($pdo, $id_antena), array_flip(['id_antena']));
             } else {
-                unset($old['old']);
-                $antena = antena_find($id_antena);
+                $antena = getAntenaFindId($pdo, $id_antena);
             }
 
             return APP_TWIG->render('/Antena/antena_form.twig', [
                     'titulo'        => 'Editar Antena',
                     'principal_url' => 'home',
+                    'csrf'          => getCsrfToken(),
                     'old'           => $old,
                     'antena'        => $antena,
                     'ufs'           => getUfOrdenado(),
@@ -160,15 +206,33 @@ try {
 
         })(),
         'excluir' => (function () use ($pdo, $id_antena, $rank, $per_page) {
-            $id = $id_antena;
 
-            if (!$id) {
+            if($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                http_response_code(405);
+                echo 'Método inválido.';
+                exit;
+            }
+
+            if(!verifyCsrfToken($_POST['csrf_token_form'])) {
+                http_response_code(403);
+                echo 'Por motivos de segurança, sua sessão expirou. Recarregue a página e tente novamente.';
+                exit;
+            }
+
+            $old = [];
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $old = $_POST;
+            }
+
+            $id = $old['id_antena'];
+
+            if (trim($id) === '') {
                 http_response_code(400);
                 echo 'ID inválido.';
                 exit;
             }
 
-            $antena = antena_find($id);
+            $antena = getAntenaFindId($pdo, $id);
 
             if (!$antena) {
                 http_response_code(404);
@@ -185,12 +249,13 @@ try {
 
             $params = getParametroConsulta($pdo, $per_page);
 
-            if (antena_delete($id)) {
+            if (antena_delete($pdo, $id)) {
                 flash('success', 'Antena excluída com sucesso!');
 
                 return APP_TWIG->render('/Antena/antena_list.twig', [
                     'titulo'        => 'Lista de Antenas',
                     'principal_url' => 'home',
+                    'csrf'          => getCsrfToken(),
                     'ranking_ufs'   => getAntenaRankingUf($pdo, $rank),
                     'antenas'       => getAntenaList($pdo, $params['options']),
                     'page'          => $params['page'],
@@ -200,13 +265,14 @@ try {
                     'uf'            => $params['uf'],
                     'flash_success' => take_flash('success'),
                     'flash_error'   => take_flash('error'),
-                    'redir_msg'     => '../listar',
+                    'redir_msg'     => 'listar',
                 ]);
             } else {
 
                 flash('error', 'Falha ao excluir antena.');
                 return APP_TWIG->render('/Antena/antena_list.twig', [
-                    'titulo'        => 'Listar Antenas',
+                    'titulo'        => 'Lista de Antenas',
+                    'csrf'          => getCsrfToken(),
                     'principal_url' => 'home',
                     'ranking_ufs'   => getAntenaRankingUf($pdo, $rank),
                     'antenas'       => getAntenaList($pdo, $params['options']),
@@ -229,6 +295,7 @@ try {
             return APP_TWIG->render('/Antena/antena_list.twig', [
                 'titulo'        => 'Lista de Antenas',
                 'principal_url' => 'home',
+                'csrf'          => getCsrfToken(),
                 'ranking_ufs'  => getAntenaRankingUf($pdo, $rank),
                 'antenas'  => getAntenaList($pdo, $params['options']),
                 'page'     => $params['page'],
@@ -238,18 +305,49 @@ try {
                 'uf'       => $params['uf'],
             ]);
         })(),
-        'mapa' => (function () use ($id_antena) {
+        'mapa' => (function () use ($pdo, $id_antena, $per_page, $rank) {
+            if($id_antena === '') {
+                $id_antena = $_POST['id_antena'] ?? '';
+            }
+
+            if ($id_antena === '' && ($_POST['id_antena'] ?? '') === '') {
+                $params = getParametroConsulta($pdo, $per_page);
+
+                flash('error', 'Não foi possível localizar a antena.');
+                return APP_TWIG->render('/Antena/antena_list.twig', [
+                    'titulo' => 'Lista de Antenas',
+                    'principal_url' => 'home',
+                    'csrf' => getCsrfToken(),
+                    'ranking_ufs' => getAntenaRankingUf($pdo, $rank),
+                    'antenas' => getAntenaList($pdo, $params['options']),
+                    'page' => $params['page'],
+                    'total' => $params['total'],
+                    'pages' => $params['pages'],
+                    'q' => $params['search'],
+                    'uf' => $params['uf'],
+                    'flash_error' => take_flash('error'),
+                    'redir_msg' => 'listar',
+                ]);
+            }
+
             return APP_TWIG->render('/Antena/mapa.twig', [
                 'titulo'        => 'Ver Antena',
                 'principal_url' => 'home',
-                'antena'        => antena_find($id_antena),
+                'csrf'          => getCsrfToken(),
+                'antena'        => getAntenaFindId($pdo, $id_antena),
             ]);
         })(),
-        'salvar' => (function () use($ext_allowed) {
+        'salvar' => (function () use($pdo, $ext_allowed) {
 
             if($_SERVER['REQUEST_METHOD'] !== 'POST') {
                 http_response_code(405);
                 echo 'Método inválido.';
+                exit;
+            }
+
+            if(!verifyCsrfToken($_POST['csrf_token_form'])) {
+                http_response_code(403);
+                echo 'Por motivos de segurança, sua sessão expirou. Recarregue a página e tente novamente.';
                 exit;
             }
 
@@ -282,27 +380,28 @@ try {
                     'titulo'        => 'Cadastrar Antena',
                     'principal_url' => 'home',
                     'antena'        => $in,
-                    'flash_error'   => 'Tipo de arquivo não permitido, aceito apenas [ '.implode(' | ', $ext_allowed).' ]',
+                    'flash_error'   => 'Tipo de arquivo não permitido, aceito apenas <br>[ '.implode(' | ', $ext_allowed).' ]',
                     'redir_msg'     => 'cadastrar',
                 ]);
             }
 
             $in['foto_path'] = $retorno_upload;
 
-            $newId = antena_create($in);
+            $newId = antena_create($pdo, $in);
 
-            if ($newId) {
+            if (trim($newId) !== '') {
+                $in['id_antena'] = $newId;
                 flash('success', 'Antena cadastrada com sucesso!');
                 return APP_TWIG->render('/Antena/antena_form.twig', [
                     'titulo'        => 'Editar Antena',
                     'principal_url' => 'home',
-                    'antena'        => antena_find($newId),
+                    'antena'        => getAntenaFindId($pdo, $newId),
                     'flash_success' => take_flash('success'),
-                    'redir_msg'     => 'editar/'.$newId,
+                    'redir_msg'     => 'editar',
                 ]);
             }
 
-            flash('error', 'Falha ao Cadastrar antena.');
+            flash('error', 'Falha ao Cadastrar antena, verifique Descrição já existente.');
             return APP_TWIG->render('/Antena/antena_form.twig', [
                 'titulo'        => 'Cadastrar Antena',
                 'principal_url' => 'home',
@@ -311,12 +410,36 @@ try {
                 'redir_msg'     => 'cadastrar',
             ]);
         })(),
-        'ver' => (function () use ($id_antena) {
+        'ver' => (function () use ($pdo, $id_antena, $per_page, $rank) {
+            if($id_antena === '') {
+                $id_antena = $_POST['id_antena'] ?? '';
+            }
+
+            if ($id_antena === '' && ($_POST['id_antena'] ?? '') === '') {
+                $params = getParametroConsulta($pdo, $per_page);
+
+                flash('error', 'Não foi possível localizar a antena.');
+                return APP_TWIG->render('/Antena/antena_list.twig', [
+                    'titulo' => 'Lista de Antenas',
+                    'principal_url' => 'home',
+                    'csrf' => getCsrfToken(),
+                    'ranking_ufs' => getAntenaRankingUf($pdo, $rank),
+                    'antenas' => getAntenaList($pdo, $params['options']),
+                    'page' => $params['page'],
+                    'total' => $params['total'],
+                    'pages' => $params['pages'],
+                    'q' => $params['search'],
+                    'uf' => $params['uf'],
+                    'flash_error' => take_flash('error'),
+                    'redir_msg' => 'listar',
+                ]);
+            }
 
             return APP_TWIG->render('/Antena/antena_view.twig', [
                 'titulo'        => 'Ver Antena',
                 'principal_url' => 'home',
-                'antena'       => antena_find($id_antena),
+                'csrf'          => getCsrfToken(),
+                'antena'       => getAntenaFindId($pdo, $id_antena),
             ]);
         })(),
         default => APP_TWIG->render('/404/404.twig'),

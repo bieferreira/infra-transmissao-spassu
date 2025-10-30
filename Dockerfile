@@ -15,6 +15,8 @@ RUN pecl install xdebug \
     && docker-php-ext-enable xdebug \
     && echo "xdebug.start_with_request=yes\nxdebug.client_port=9003\nxdebug.log_level=0" > /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
+RUN docker-php-ext-install bcmath
+
 # Copia nosso vhost customizado
 COPY docker/apache/000-default.conf /etc/apache2/sites-available/000-default.conf
 

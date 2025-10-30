@@ -19,49 +19,134 @@
 </head>
 <body class="bg-body body-bg-limited">
 
-    {% include 'Partials/header.twig' %}
+{% include 'Partials/header.twig' %}
 
-        <main class="container my-4">
-            {% block content %}{% endblock %}
-        </main>
+<main class="container my-4">
+    {% block content %}{% endblock %}
+</main>
 
-    {% include 'Partials/footer.twig' %}
+{% include 'Partials/footer.twig' %}
 
-<script src="{{ ASSETS_URL }}/js/bootstrap.bundle.min.js"></script>
+
+{# form invisível único #}
+<form id="frm_hidden" method="post" action="" style="display: none">
+    <input type="hidden" name="csrf_token_form" value="{{ csrf }}">
+    <input type="hidden" name="id_antena" value="">
+    <input type="hidden" name="form_name" value="frm_hidden">
+</form>
 
 {# Slot para JS extra por página #}
 {% block scripts %}
-<script>
-function ocultarAlert(alert) {
-    alert.classList.add('fade');
-    alert.style.opacity = '0';
-    setTimeout(() => alert.remove(), 500);
-}
-
-function ajusteRota() {
-    const redir_msg = "{{ redir_msg|e('js') }}";
-    if(redir_msg) {
-        const form = document.querySelector('#frm_form');
-
-        if(form) {
-            form.action = redir_msg;
-            form.submit();
-        } else {
-            window.location.replace(redir_msg);
+    <script src="{{ ASSETS_URL }}/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ ASSETS_URL }}/js/sweetalert2.all.min.js"></script>
+    <script>
+        function ocultarAlert(alert) {
+            alert.classList.add('fade');
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 500);
         }
-    }
-}
 
-document.addEventListener('DOMContentLoaded', function () {
-    const alerts = document.querySelectorAll('.alert');
-    alerts.forEach(alert => {
-        setTimeout(() => {
-            ocultarAlert(alert);
-            ajusteRota();
-        }, 4000);
-    });
-});
-</script>
+        function ajusteRota() {
+            const redir_msg = "{{ redir_msg|e('js') }}";
+            if(redir_msg) {
+                const form = document.querySelector('#frm_form');
+
+                if(form) {
+                    form.action = redir_msg;
+                    form.submit();
+                } else {
+                    window.location.replace(redir_msg);
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const alerts = document.querySelectorAll('.swal2-container');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    ocultarAlert(alert);
+                    ajusteRota();
+                }, 4000);
+            });
+        });
+
+        // document.addEventListener('click', function(e) {
+        document.addEventListener('click', async (e) => {
+            const form = document.getElementById('frm_hidden');
+            const btn_see = e.target.closest('.btn-ver');
+            const btn_map = e.target.closest('.btn-mapa');
+            const btn_update = e.target.closest('.btn-editar');
+            const btn_delete = e.target.closest('.btn-excluir');
+
+            if (!btn_see && !btn_map && !btn_update && !btn_delete) return;
+
+            if(btn_see) {
+                form.action = btn_see.dataset.action;
+                form.querySelector('input[name="id_antena"]').value = btn_see.dataset.idantena;
+                form.submit();
+            }
+
+            if(btn_map) {
+                form.action = btn_map.dataset.action;
+                form.target = '_blank';
+                form.querySelector('input[name="id_antena"]').value = btn_map.dataset.idantena;
+                form.submit();
+            }
+
+            if(btn_update) {
+                form.action = btn_update.dataset.action;
+                form.querySelector('input[name="id_antena"]').value = btn_update.dataset.idantena;
+                form.submit();
+            }
+
+            if (btn_delete) {
+                const result = await Swal.fire({
+                    title: 'Tem certeza que deseja excluir esta antena?',
+                    html: 'Não será possível recuperar.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sim, excluir!',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6'
+                });
+
+                if (result.isConfirmed) {
+                    form.action = btn_delete.dataset.action;
+                    form.querySelector('input[name="id_antena"]').value = btn_delete.dataset.idantena;
+                    form.submit();
+                }
+            }
+        });
+    </script>
+    {% if flash_success is defined and flash_success is not empty %}
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Sucesso!',
+            html: '{{ flash_success|e('js') }}',
+            showConfirmButton: false,
+            timer: 4000,
+            timerProgressBar: true
+        });
+    </script>
+    {% endif %}
+
+    {% if (flash_error is defined and flash_error is not empty)
+        or (errors is defined and errors is not empty) %}
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro!',
+            html: '{{ flash_error|default(errors|join(", "))|e("js") }}',
+            showConfirmButton: false,
+            timer: 4000,
+            timerProgressBar: true
+        });
+    </script>
+    {% endif %}
+
 {% endblock %}
+
 </body>
 </html>

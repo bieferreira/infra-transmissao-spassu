@@ -11,23 +11,23 @@
             </a>
         </div>
 
-        {# ALERTAS DE ERRO / SUCESSO (opcional) #}
-        {% if flash_success %}
-            <div class="alert alert-success">{{ flash_success }}</div>
-        {% endif %}
-        {% if flash_error %}
-            <div class="alert alert-danger">{{ flash_error }}</div>
-        {% endif %}
-        {% if errors is defined and errors %}
-            <div class="alert alert-danger mb-3">
-                <strong>Corrija os campos abaixo:</strong>
-                <ul class="mb-0">
-                    {% for e in errors %}
-                        <li>{{ e }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
+{#        #}{# ALERTAS DE ERRO / SUCESSO (opcional) #}
+{#        {% if flash_success %}#}
+{#            <div class="alert alert-success">{{ flash_success }}</div>#}
+{#        {% endif %}#}
+{#        {% if flash_error %}#}
+{#            <div class="alert alert-danger">{{ flash_error }}</div>#}
+{#        {% endif %}#}
+{#        {% if errors is defined and errors %}#}
+{#            <div class="alert alert-danger mb-3">#}
+{#                <strong>Corrija os campos abaixo:</strong>#}
+{#                <ul class="mb-0">#}
+{#                    {% for e in errors %}#}
+{#                        <li>{{ e }}</li>#}
+{#                    {% endfor %}#}
+{#                </ul>#}
+{#            </div>#}
+{#        {% endif %}#}
 
         {# Ranking Top 5 UFs #}
         <div class="card mt-5 mb-3">
@@ -116,10 +116,10 @@
                             <td>{{ a.altura|number_format(2, ',', '.') }}</td>
                             <td>{{ a.data_implantacao ? a.data_implantacao | date("d/m/Y") : '' }}</td>
                             <td class="text-center td-actions">
-                                <a href="{{ BASE_URL }}/antena/ver/{{ a.id_antena }}" class="btn btn-sm btn-outline-info ms-2">Ver</a>
-                                <a href="{{ BASE_URL }}/antena/mapa/{{ a.id_antena }}" class="btn btn-sm btn-outline-primary ms-2" target="_blank">Mapa</a>
-                                <a href="{{ BASE_URL }}/antena/editar/{{ a.id_antena }}" class="btn btn-sm btn-outline-warning ms-2">Editar</a>
-                                <a href="{{ BASE_URL }}/antena/excluir/{{ a.id_antena }}" class="btn btn-sm btn-outline-danger ms-2" onclick="return confirm('Deseja realmente excluir esta antena?')">Excluir</a>
+                                <a href="#" class="btn btn-sm btn-outline-info btn-ver ms-2" data-action="{{ BASE_URL }}/antena/ver" data-idantena="{{ a.id_antena }}">Ver</a>
+                                <a href="#" class="btn btn-sm btn-outline-primary btn-mapa ms-2" data-action="{{ BASE_URL }}/antena/mapa" data-idantena="{{ a.id_antena }}">Mapa</a>
+                                <a href="#" class="btn btn-sm btn-outline-warning btn-editar ms-2" data-action="{{ BASE_URL }}/antena/editar" data-idantena="{{ a.id_antena }}">Editar</a>
+                                <a href="#" class="btn btn-sm btn-outline-danger btn-excluir ms-2" data-action="{{ BASE_URL }}/antena/excluir" data-idantena="{{ a.id_antena }}">Excluir</a>
                             </td>
                         </tr>
                     {% endfor %}
@@ -190,4 +190,5 @@
 
         {% endif %}
     </div>
+
 {% endblock %}

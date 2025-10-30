@@ -3,7 +3,7 @@
         'name' => '__root__',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'f10ff4b615a565951d7847edc02ebd6d0c190a39',
+        'reference' => 'e55b8fa9ec89fcbbcac9ca1c29b21b2bdfce1500',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         '__root__' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'f10ff4b615a565951d7847edc02ebd6d0c190a39',
+            'reference' => 'e55b8fa9ec89fcbbcac9ca1c29b21b2bdfce1500',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -150,6 +150,15 @@
             'replaced' => array(
                 0 => '*',
             ),
+        ),
+        'hashids/hashids' => array(
+            'pretty_version' => '5.0.2',
+            'version' => '5.0.2.0',
+            'reference' => '197171016b77ddf14e259e186559152eb3f8cf33',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../hashids/hashids',
+            'aliases' => array(),
+            'dev_requirement' => false,
         ),
         'jakub-onderka/php-parallel-lint' => array(
             'dev_requirement' => true,

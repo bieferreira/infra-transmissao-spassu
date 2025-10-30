@@ -97,6 +97,10 @@ class ComposerStaticInit180ce08b92c65e9181220dfdef87ac85
         array (
             'JsonSchema\\' => 11,
         ),
+        'H' => 
+        array (
+            'Hashids\\' => 8,
+        ),
         'F' => 
         array (
             'Fidry\\CpuCoreCounter\\' => 21,
@@ -311,6 +315,10 @@ class ComposerStaticInit180ce08b92c65e9181220dfdef87ac85
         'JsonSchema\\' => 
         array (
             0 => __DIR__ . '/..' . '/justinrainbow/json-schema/src/JsonSchema',
+        ),
+        'Hashids\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/hashids/hashids/src',
         ),
         'Fidry\\CpuCoreCounter\\' => 
         array (

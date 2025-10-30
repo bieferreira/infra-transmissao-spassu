@@ -13,12 +13,13 @@
             </div>
 
             <div class="d-flex gap-2">
-                <a href="{{ BASE_URL }}/antena/editar/{{ antena.id_antena }}" class="btn btn-outline-warning">
+                <a href="#" class="btn btn-outline-warning btn-editar"
+                   data-action="{{ BASE_URL }}/antena/editar" data-idantena="{{ antena.id_antena }}">
                     <i class="bi bi-pencil-square"></i> Editar
                 </a>
-                <a href="{{ BASE_URL }}/antena/excluir/{{ antena.id_antena }}"
-                   class="btn btn-outline-danger"
-                   onclick="return confirm('Deseja realmente excluir esta antena?')">
+                <a href="#"
+                   class="btn btn-outline-danger btn-excluir"
+                   data-action="{{ BASE_URL }}/antena/excluir" data-idantena="{{ antena.id_antena }}">
                     <i class="bi bi-trash"></i> Excluir
                 </a>
                 <a href="{{ BASE_URL }}/antena" class="btn btn-secondary">
@@ -71,27 +72,27 @@
                 </button>
             </div>
             <div id="mapaantena" class="collapse hidden">
-            <div class="card-body p-0">
-                <iframe
-                        id="iframeAntenaMapa"
-                        name="iframeAntenaMapa"
-                        src="{{ BASE_URL }}/antena/mapa/{{ antena.id_antena }}"
-                        class="w-100 border rounded"
-                        style="height: 520px;">
-                </iframe>
-            </div>
-            <div class="card-footer d-flex flex-wrap gap-2">
-                <a class="btn btn-sm btn-outline-primary"
-                   href="https://www.google.com/maps/search/?api=1&query={{ antena.latitude }},{{ antena.longitude }}"
-                   target="_blank" rel="noopener">
-                    Abrir no Google Maps
-                </a>
-                <a class="btn btn-sm btn-outline-secondary"
-                   href="https://www.openstreetmap.org/?mlat={{ antena.latitude }}&mlon={{ antena.longitude }}#map=18/{{ antena.latitude }}/{{ antena.longitude }}"
-                   target="_blank" rel="noopener">
-                    Abrir no OSM
-                </a>
-            </div>
+                <div class="card-body p-0">
+                    <iframe
+                            id="iframeAntenaMapa"
+                            name="iframeAntenaMapa"
+                            src="{{ BASE_URL }}/antena/mapa/{{ antena.id_antena }}"
+                            class="w-100 border rounded"
+                            style="height: 520px;">
+                    </iframe>
+                </div>
+                <div class="card-footer d-flex flex-wrap gap-2">
+                    <a class="btn btn-sm btn-outline-primary"
+                       href="https://www.google.com/maps/search/?api=1&query={{ antena.latitude }},{{ antena.longitude }}"
+                       target="_blank" rel="noopener">
+                        Abrir no Google Maps
+                    </a>
+                    <a class="btn btn-sm btn-outline-secondary"
+                       href="https://www.openstreetmap.org/?mlat={{ antena.latitude }}&mlon={{ antena.longitude }}#map=18/{{ antena.latitude }}/{{ antena.longitude }}"
+                       target="_blank" rel="noopener">
+                        Abrir no OSM
+                    </a>
+                </div>
             </div>
         </div>
 
@@ -117,9 +118,7 @@
                 </div>
             </div>
 
-    </div>
-    <br><br>
+        </div>
+        <br><br>
     </div>
 {% endblock %}
-
-{% block scripts %}{% endblock %}

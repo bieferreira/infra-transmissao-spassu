@@ -8,7 +8,7 @@ $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/Views');
 
 $twig = new \Twig\Environment($loader, [
     'cache' => false,
-    'debug' => true,
+    'debug' => false,
 ]);
 
 // === App ===

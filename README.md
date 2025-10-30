@@ -157,6 +157,24 @@
     	>> refatorando listar otimizar captura de parametros
     => Implementando melhoria mudar rota browser
     	>> Realizado testes finais
-    => Não realizado funcionalidade usuario e autenticacao
+    => Não realizado funcionalidade usuário e autenticacão
 
-fim 16:26 MS
+FIM 28/10/2025 16:26 MS
+
+	=> Refatorando funcionalidades Model
+		>> rank antena model
+		>> list antena model
+		>> count antena model
+		>> ajuste rota projeto
+	=> Refatorando segurança dados
+    => Instalar dependencias
+    	>> Hashid
+			=>> composer require hashids/hashids
+		>> gerar token hashid 
+			=>> php -r "echo bin2hex(random_bytes(32));"
+		>> composer require hashids/hashids
+		>> sudo apt-get update
+			=>> sudo apt-get install -y php8.3-bcmath
+			=>> atualizado Dockerfile
+		>> implementando métodos
+		>> refatorando apls para utilizar hashid

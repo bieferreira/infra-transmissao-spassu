@@ -20,13 +20,17 @@
 
             <div class="d-flex gap-2">
                 {% if antena.id_antena %}
-                    <a href="{{ BASE_URL }}/antena/ver/{{ antena.id_antena }}" class="btn btn-outline-info">
-                        <i class="bi bi-eye"></i> Ver
+                    <a href="#" class="btn btn-outline-info btn-ver"
+                       data-action="{{ BASE_URL }}/antena/ver" data-idantena="{{ antena.id_antena }}">
+                        <i class="bi bi-pencil-square"></i> Ver
                     </a>
-                    <a href="{{ BASE_URL }}/antena/mapa/{{ antena.id_antena }}" class="btn btn-outline-primary" target="_blank">
-                        <i class="bi bi-eye"></i> Mapa
+                    <a href="#"
+                       class="btn btn-outline-primary btn-mapa"
+                       data-action="{{ BASE_URL }}/antena/mapa" data-idantena="{{ antena.id_antena }}">
+                        <i class="bi bi-trash"></i> Mapa
                     </a>
-                    <a href="{{ BASE_URL }}/antena/excluir/{{ antena.id_antena }}" class="btn btn-outline-danger" onclick="return confirm('Deseja realmente excluir esta antena?')">
+                    <a href="#" class="btn btn-outline-danger btn-excluir"
+                       data-action="{{ BASE_URL }}/antena/excluir" data-idantena="{{ antena.id_antena }}">
                         <i class="bi bi-eye"></i> Excluir
                     </a>
                 {% endif %}
@@ -36,27 +40,27 @@
             </div>
         </div>
 
-        {# ALERTAS DE ERRO / SUCESSO (opcional) #}
-        {% if flash_success %}
-            <div class="alert alert-success">{{ flash_success }}</div>
-        {% endif %}
-        {% if flash_error %}
-            <div class="alert alert-danger">{{ flash_error }}</div>
-        {% endif %}
-        {% if errors is defined and errors %}
-            <div class="alert alert-danger mb-3">
-                <strong>Corrija os campos abaixo:</strong>
-                <ul class="mb-0">
-                    {% for e in errors %}
-                        <li>{{ e }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
+{#        #}{# ALERTAS DE ERRO / SUCESSO (opcional) #}
+{#        {% if flash_success %}#}
+{#            <div class="alert alert-success">{{ flash_success }}</div>#}
+{#        {% endif %}#}
+{#        {% if flash_error %}#}
+{#            <div class="alert alert-danger">{{ flash_error }}</div>#}
+{#        {% endif %}#}
+{#        {% if errors is defined and errors %}#}
+{#            <div class="alert alert-danger mb-3">#}
+{#                <strong>Corrija os campos abaixo:</strong>#}
+{#                <ul class="mb-0">#}
+{#                    {% for e in errors %}#}
+{#                        <li>{{ e }}</li>#}
+{#                    {% endfor %}#}
+{#                </ul>#}
+{#            </div>#}
+{#        {% endif %}#}
 
         <form
                 id="frm_form"
-                action="{{ BASE_URL }}/antena/{{ antena.id_antena ? 'atualizar/' ~ antena.id_antena : 'salvar' }}"
+                action="{{ BASE_URL }}/antena/{{ antena.id_antena ? 'atualizar' : 'salvar' }}"
                 method="post"
                 enctype="multipart/form-data"
                 class="needs-validation js-sync-url"
@@ -66,7 +70,7 @@
 
             {# CSRF opcional #}
             {% if csrf is defined %}
-                <input type="hidden" name="_csrf" value="{{ csrf }}">
+                <input type="hidden" name="csrf_token_form" value="{{ csrf }}">
             {% endif %}
 
             {# 1) DADOS PRINCIPAIS #}
@@ -113,7 +117,6 @@
                         </div>
 
                         <div class="col-md-6">
-                            {{ old.data_implantacao }}
                             <label class="form-label">Data de Implantação</label>
                                 {% set impl = old.data_implantacao
                                 | default(antena.data_implantacao

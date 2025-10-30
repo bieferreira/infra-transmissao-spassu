@@ -53,6 +53,7 @@ return array(
     'NunoMaduro\\PhpInsights\\' => array($vendorDir . '/nunomaduro/phpinsights/src'),
     'League\\Container\\' => array($vendorDir . '/league/container/src'),
     'JsonSchema\\' => array($vendorDir . '/justinrainbow/json-schema/src/JsonSchema'),
+    'Hashids\\' => array($vendorDir . '/hashids/hashids/src'),
     'Fidry\\CpuCoreCounter\\' => array($vendorDir . '/fidry/cpu-core-counter/src'),
     'Evenement\\' => array($vendorDir . '/evenement/evenement/src'),
     'DeepCopy\\' => array($vendorDir . '/myclabs/deep-copy/src/DeepCopy'),

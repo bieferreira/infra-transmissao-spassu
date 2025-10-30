@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/../../db.php';
 
+
 function getAntenaRankingUf(PDO $pdo, int $limit = 5): array
 {
     $sql = <<<SQL
@@ -41,7 +42,6 @@ function getAntenaRankingUf(PDO $pdo, int $limit = 5): array
  *   'uf' => 'MS'              // filtra por UF
  * ]
  */
-//function antena_list(array $options = []): array
 function getAntenaList(PDO $pdo, $options): array
 {
     $page     = $options['page'];
@@ -99,6 +99,15 @@ function getAntenaList(PDO $pdo, $options): array
 
     try {
         $stmt->execute();
+
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($result as &$row) {
+            if (!empty($row['id_antena'])) {
+                $row['id_antena'] = setHashidEncode((int)$row['id_antena']);
+            }
+        }
+        unset($row);
     } catch (PDOException $e) {
         if (defined('APP_ENV') && APP_ENV === 'dev') {
             die('Erro ao conectar a tabela antena: ' . htmlspecialchars($e->getMessage()));
@@ -107,7 +116,7 @@ function getAntenaList(PDO $pdo, $options): array
         }
     }
 
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    return $result;
 
 }
 
@@ -168,26 +177,51 @@ function getAntenaCount(PDO $pdo, array $options): int
 /**
  * Busca uma antena pelo ID.
  */
-function antena_find(int $id): ?array
+function getAntenaFindId(PDO $pdo, string $id): ?array
 {
-    $pdo = db();
-    $stmt = $pdo->prepare("SELECT a.id_antena, a.descricao, a.latitude, a.longitude, a.uf, a.altura, a.data_implantacao, a.foto_path, e.uf_descricao
-                        FROM antenas AS a
-                        INNER JOIN estados AS e ON e.uf = a.uf 
-                        WHERE id_antena = :id AND excluido = '0' LIMIT 1");
+    $id = (int)getHashidDecode($id);
+
+    $sql = <<<SQL
+        SELECT 
+            a.id_antena, 
+            a.descricao, 
+            a.latitude, 
+            a.longitude, 
+            a.uf, 
+            a.altura, 
+            a.data_implantacao, 
+            a.foto_path, 
+            e.uf_descricao
+        FROM antenas AS a
+        INNER JOIN estados AS e ON e.uf = a.uf 
+        WHERE 
+            id_antena = :id 
+            AND excluido = '0' 
+        LIMIT 1
+    SQL;
+
+    $stmt = $pdo->prepare($sql);
     $stmt->bindValue(':id', $id, PDO::PARAM_INT);
     $stmt->execute();
 
-    $row = $stmt->fetch();
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!empty($row['id_antena'])) {
+            $row['id_antena'] = setHashidEncode((int)$row['id_antena']);
+        }
+
+
     return $row ?: null;
 }
 
 /**
  * Atualizar antena
  */
-function antena_update(int $id, array $dados): bool
+function antena_update(PDO $pdo, string $id, array $dados): bool
 {
-    $pdo = db();
+    $mensagemerro = "";
+    $id = (int)getHashidDecode($id);
+
     try {
     $sql = "UPDATE antenas SET 
                 descricao = :descricao,
@@ -213,11 +247,6 @@ function antena_update(int $id, array $dados): bool
 
         if ($stmt->execute()) {
             return true;
-            //$lastId = $pdo->lastInsertId();
-            //echo "<h3 style='color:green'>Assunto cadastrado com sucesso!</h3>";
-            //setIframeMensagemErro();
-            //redirecionaPrincipal('../view/assuntoGrid.php');
-
         }
 
     } catch (PDOException $e) {
@@ -237,10 +266,10 @@ function antena_update(int $id, array $dados): bool
     return false;
 }
 
-function antena_create(array $dados): int
+function antena_create(PDO $pdo, array $dados): string
 {
-    $pdo = db();
-
+    $mensagemerro = "";
+    try {
     $sql = "INSERT INTO antenas (
                 descricao,
                 latitude,
@@ -273,15 +302,23 @@ function antena_create(array $dados): int
     $stmt->bindValue(':id_usuario_inclusao', ID_USUARIO);
 
     if ($stmt->execute()) {
-        return (int) $pdo->lastInsertId();
+        return setHashidEncode((int)$pdo->lastInsertId());
     }
 
-    return 0;
+    } catch (PDOException $e) {
+        $mensagemerro = $e->getMessage();
+    } catch (InvalidArgumentException $e) {
+        $mensagemerro = $e->getMessage();
+    } catch (Exception $e) {
+        $mensagemerro = $e->getMessage();
+    }
+
+    return '';
 }
 
-function antena_delete(int $id): bool
+function antena_delete(PDO $pdo, string $id): bool
 {
-    $pdo = db();
+    $id = (int)getHashidDecode($id);
 
     try {
         $id_usuario_inclusao = ID_USUARIO;
