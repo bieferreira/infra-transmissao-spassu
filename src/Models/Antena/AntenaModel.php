@@ -104,7 +104,7 @@ function getAntenaList(PDO $pdo, $options): array
 
         foreach ($result as &$row) {
             if (!empty($row['id_antena'])) {
-                $row['id_antena'] = setHashidEncode((int)$row['id_antena']);
+                $row['id_antena'] = setHashidEncode((int) $row['id_antena']);
             }
         }
         unset($row);
@@ -149,7 +149,7 @@ function getAntenaCount(PDO $pdo, array $options): int
     SQL;
 
     if ($where) {
-        $sql .= " AND " . implode(' AND ', $where);
+        $sql .= ' AND ' . implode(' AND ', $where);
     }
 
     $stmt = $pdo->prepare($sql);
@@ -170,7 +170,7 @@ function getAntenaCount(PDO $pdo, array $options): int
         }
     }
 
-    return (int)$row['total'];
+    return (int) $row['total'];
 
 }
 
@@ -207,7 +207,7 @@ function getAntenaFindId(PDO $pdo, string $id): ?array
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!empty($row['id_antena'])) {
-            $row['id_antena'] = setHashidEncode((int)$row['id_antena']);
+            $row['id_antena'] = setHashidEncode((int) $row['id_antena']);
         }
 
 
@@ -223,16 +223,18 @@ function antena_update(PDO $pdo, string $id, array $dados): bool
     $id = (int)getHashidDecode($id);
 
     try {
-    $sql = "UPDATE antenas SET 
-                descricao = :descricao,
-                latitude = :latitude,
-                longitude = :longitude,
-                uf = :uf,
-                altura = :altura,
-                foto_path = COALESCE(:foto_path, foto_path),
-                data_implantacao = :data_implantacao,
-                id_usuario_alteracao = :id_usuario_alteracao
-            WHERE id_antena = :id";
+    $sql = <<<SQL
+        UPDATE antenas SET 
+            descricao = :descricao,
+            latitude = :latitude,
+            longitude = :longitude,
+            uf = :uf,
+            altura = :altura,
+            foto_path = COALESCE(:foto_path, foto_path),
+            data_implantacao = :data_implantacao,
+            id_usuario_alteracao = :id_usuario_alteracao
+        WHERE id_antena = :id
+    SQL;
 
     $stmt = $pdo->prepare($sql);
     $stmt->bindValue(':id', $id, PDO::PARAM_INT);
@@ -270,7 +272,8 @@ function antena_create(PDO $pdo, array $dados): string
 {
     $mensagemerro = "";
     try {
-    $sql = "INSERT INTO antenas (
+    $sql = <<<SQL
+            INSERT INTO antenas (
                 descricao,
                 latitude,
                 longitude,
@@ -288,7 +291,8 @@ function antena_create(PDO $pdo, array $dados): string
                 :foto_path,
                 :data_implantacao,
                 :id_usuario_inclusao
-            )";
+            )
+        SQL;
 
     $stmt = $pdo->prepare($sql);
 
@@ -302,7 +306,7 @@ function antena_create(PDO $pdo, array $dados): string
     $stmt->bindValue(':id_usuario_inclusao', ID_USUARIO);
 
     if ($stmt->execute()) {
-        return setHashidEncode((int)$pdo->lastInsertId());
+        return setHashidEncode((int) $pdo->lastInsertId());
     }
 
     } catch (PDOException $e) {
@@ -323,7 +327,9 @@ function antena_delete(PDO $pdo, string $id): bool
     try {
         $id_usuario_inclusao = ID_USUARIO;
 
-        $sql = "CALL sp_delete_antena(:id_antena, :id_usuario_inclusao)";
+        $sql = <<<SQL
+            CALL sp_delete_antena(:id_antena, :id_usuario_inclusao)
+        SQL;
         $sqlPdo = $pdo->prepare($sql);
         $sqlPdo->bindParam(':id_antena', $id);
         $sqlPdo->bindParam(':id_usuario_inclusao', $id_usuario_inclusao);

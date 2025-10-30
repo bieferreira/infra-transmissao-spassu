@@ -7,8 +7,9 @@ require_once __DIR__ . '/../vendor/autoload.php';
 $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/Views');
 
 $twig = new \Twig\Environment($loader, [
-    'cache' => false,
+    'cache' => __DIR__ . '/../var/cache/twig',
     'debug' => false,
+    'auto_reload' => true,
 ]);
 
 // === App ===

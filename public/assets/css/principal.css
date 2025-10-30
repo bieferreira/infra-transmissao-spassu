@@ -123,3 +123,8 @@
     white-space: nowrap !important;
     width: 1%;
 }
+
+.w-uf {
+    white-space: nowrap !important;
+    width: 30px !important;
+}

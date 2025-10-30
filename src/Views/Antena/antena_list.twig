@@ -6,7 +6,7 @@
     <div class="container py-4 bg-white">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h2 class="mb-0 color-1">{{ titulo | default('Lista de Antenas') }}</h2>
-            <a href="{{ BASE_URL }}/antena/cadastrar" class="btn btn-primary">
+            <a href="{{ BASE_URL }}/antena/cadastrar" class="btn btn-primary btn-loading">
                 <i class="bi bi-plus-circle"></i> Nova Antena
             </a>
         </div>
@@ -52,12 +52,12 @@
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <div class="d-flex align-items-center">
                                     <span class="badge bg-secondary me-2">{{ loop.index }}</span>
-                                    <strong class="ms-5">{{ r.uf }}</strong>
+                                    <strong class="ms-5 w-uf">{{ r.uf }}</strong>
                                     <span class="ms-5 text-muted">{{ r.uf_descricao }}</span>
                                 </div>
                                 <div class="d-flex align-items-center gap-2">
                                     <span class="badge bg-dark ms-5">{{ r.total }}</span>
-                                    <a class="btn btn-sm btn-outline-primary ms-5"
+                                    <a class="btn btn-sm btn-outline-primary ms-5 btn-loading"
                                        href="{{ BASE_URL }}/antena?uf={{ r.uf }}{% if q %}&q={{ q }}{% endif %}">
                                         Listar
                                     </a>
@@ -69,16 +69,19 @@
             </div>
         </div>
 
-        <form method="get" class="row g-2 mt-5 mb-3">
+        <form id="frm_filtro" method="get" class="row g-2 mt-5 mb-3">
             <div class="col-md-4">
                 <input type="text" name="q" value="{{ q|default('') }}" class="form-control" placeholder="Buscar descrição...">
             </div>
             <div class="col-md-2">
                 <input type="text" name="uf" value="{{ uf|default('') }}" class="form-control" placeholder="UF">
             </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-outline-secondary w-100">
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-outline-success w-50 flex-fill">
                     <i class="bi bi-search"></i> Filtrar
+                </button>
+                <button type="button" class="btn btn-outline-secondary w-50 flex-fill btn-loading" data-action="{{ BASE_URL }}/antena" data-idantena="">
+                    <i class="bi bi-search"></i> Limpar
                 </button>
             </div>
         </form>
@@ -116,9 +119,9 @@
                             <td>{{ a.altura|number_format(2, ',', '.') }}</td>
                             <td>{{ a.data_implantacao ? a.data_implantacao | date("d/m/Y") : '' }}</td>
                             <td class="text-center td-actions">
-                                <a href="#" class="btn btn-sm btn-outline-info btn-ver ms-2" data-action="{{ BASE_URL }}/antena/ver" data-idantena="{{ a.id_antena }}">Ver</a>
+                                <a href="#" class="btn btn-sm btn-outline-info btn-loading ms-2" data-action="{{ BASE_URL }}/antena/ver" data-idantena="{{ a.id_antena }}">Ver</a>
                                 <a href="#" class="btn btn-sm btn-outline-primary btn-mapa ms-2" data-action="{{ BASE_URL }}/antena/mapa" data-idantena="{{ a.id_antena }}">Mapa</a>
-                                <a href="#" class="btn btn-sm btn-outline-warning btn-editar ms-2" data-action="{{ BASE_URL }}/antena/editar" data-idantena="{{ a.id_antena }}">Editar</a>
+                                <a href="#" class="btn btn-sm btn-outline-warning btn-loading ms-2" data-action="{{ BASE_URL }}/antena/editar" data-idantena="{{ a.id_antena }}">Editar</a>
                                 <a href="#" class="btn btn-sm btn-outline-danger btn-excluir ms-2" data-action="{{ BASE_URL }}/antena/excluir" data-idantena="{{ a.id_antena }}">Excluir</a>
                             </td>
                         </tr>

@@ -267,25 +267,25 @@ try {
                     'flash_error'   => take_flash('error'),
                     'redir_msg'     => 'listar',
                 ]);
-            } else {
-
-                flash('error', 'Falha ao excluir antena.');
-                return APP_TWIG->render('/Antena/antena_list.twig', [
-                    'titulo'        => 'Lista de Antenas',
-                    'csrf'          => getCsrfToken(),
-                    'principal_url' => 'home',
-                    'ranking_ufs'   => getAntenaRankingUf($pdo, $rank),
-                    'antenas'       => getAntenaList($pdo, $params['options']),
-                    'page'          => $params['page'],
-                    'total'         => $params['total'],
-                    'pages'         => $params['pages'],
-                    'q'             => $params['search'],
-                    'uf'            => $params['uf'],
-                    'flash_success' => take_flash('success'),
-                    'flash_error'   => take_flash('error'),
-                    'redir_msg'     => '../listar',
-                ]);
             }
+
+            flash('error', 'Falha ao excluir antena.');
+            return APP_TWIG->render('/Antena/antena_list.twig', [
+                'titulo'        => 'Lista de Antenas',
+                'csrf'          => getCsrfToken(),
+                'principal_url' => 'home',
+                'ranking_ufs'   => getAntenaRankingUf($pdo, $rank),
+                'antenas'       => getAntenaList($pdo, $params['options']),
+                'page'          => $params['page'],
+                'total'         => $params['total'],
+                'pages'         => $params['pages'],
+                'q'             => $params['search'],
+                'uf'            => $params['uf'],
+                'flash_success' => take_flash('success'),
+                'flash_error'   => take_flash('error'),
+                'redir_msg'     => 'listar',
+            ]);
+
 
         })(),
         'listar' => (function () use ($pdo, $rank, $per_page) {
@@ -467,12 +467,12 @@ function validate_antena(array $in): array
 
 
     $lat = $in['latitude'] ?? null;
-    if ($lat === null || $lat === '' || !is_numeric($lat) || (float)$lat < -90 || (float)$lat > 90) {
+    if ($lat === null || $lat === '' || !is_numeric($lat) || (float) $lat < -90 || (float) $lat > 90) {
         $errors[] = 'Latitude inválida (entre -90 e 90) e no máximo 7 casas decimais.';
     }
 
     $lon = $in['longitude'] ?? null;
-    if ($lon === null || $lon === '' || !is_numeric($lon) || (float)$lon < -180 || (float)$lon > 180) {
+    if ($lon === null || $lon === '' || !is_numeric($lon) || (float) $lon < -180 || (float) $lon > 180) {
         $errors[] = 'Longitude inválida (entre -180 e 180) e no máximo 7 casas decimais.';
     }
 
@@ -484,7 +484,7 @@ function validate_antena(array $in): array
     }
 
     $alt = $in['altura'] ?? null;
-    if ($alt === null || $alt === '' || !is_numeric($alt) || (float)$alt <= 0) {
+    if ($alt === null || $alt === '' || !is_numeric($alt) || (float) $alt <= 0) {
         $errors[] = 'Altura inválida (exemplo 3,50).';
     }
 
@@ -599,10 +599,10 @@ function allowed(): string {
 
 function getParametroConsulta($pdo, $per_page){
     // parâmetros consulta
-    $page    = isset($_GET['page']) && (int)$_GET['page'] > 0 ? (int)$_GET['page'] : 1;
-    $search  = isset($_GET['q']) ? (string)$_GET['q'] : '';
-    $uf      = isset($_GET['uf']) ? (string)$_GET['uf'] : '';
-    $per_page = isset($_GET['per_page']) ? (int)$_GET['per_page'] : $per_page;
+    $page    = isset($_GET['page']) && (int) $_GET['page'] > 0 ? (int) $_GET['page'] : 1;
+    $search  = isset($_GET['q']) ? (string) $_GET['q'] : '';
+    $uf      = isset($_GET['uf']) ? (string) $_GET['uf'] : '';
+    $per_page = isset($_GET['per_page']) ? (int) $_GET['per_page'] : $per_page;
 
     $options = [
         'page'     => $page,
@@ -612,7 +612,7 @@ function getParametroConsulta($pdo, $per_page){
     ];
 
     $total   = getAntenaCount($pdo, $options);
-    $pages   = (int)ceil($total / $per_page);
+    $pages   = (int) ceil($total / $per_page);
 
     return compact('page', 'search', 'uf', 'options', 'total', 'pages');
 }

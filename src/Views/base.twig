@@ -70,36 +70,25 @@
             });
         });
 
-        // document.addEventListener('click', function(e) {
         document.addEventListener('click', async (e) => {
             const form = document.getElementById('frm_hidden');
-            const btn_see = e.target.closest('.btn-ver');
-            const btn_map = e.target.closest('.btn-mapa');
-            const btn_update = e.target.closest('.btn-editar');
-            const btn_delete = e.target.closest('.btn-excluir');
+            form.target = '_self';
 
-            if (!btn_see && !btn_map && !btn_update && !btn_delete) return;
+            const CLICKABLE = [
+                // '.btn-ver',
+                '.btn-mapa',
+                // '.btn-editar',
+                '.btn-excluir',
+                // '.btn-voltar',
+                '.swal2-confirm',
+                '.btn-loading',
+            ].join(',');
 
-            if(btn_see) {
-                form.action = btn_see.dataset.action;
-                form.querySelector('input[name="id_antena"]').value = btn_see.dataset.idantena;
-                form.submit();
-            }
+            const btn = e.target.closest(CLICKABLE);
 
-            if(btn_map) {
-                form.action = btn_map.dataset.action;
-                form.target = '_blank';
-                form.querySelector('input[name="id_antena"]').value = btn_map.dataset.idantena;
-                form.submit();
-            }
+            if (!btn) return;
 
-            if(btn_update) {
-                form.action = btn_update.dataset.action;
-                form.querySelector('input[name="id_antena"]').value = btn_update.dataset.idantena;
-                form.submit();
-            }
-
-            if (btn_delete) {
+            if(btn.matches('.btn-excluir')) {
                 const result = await Swal.fire({
                     title: 'Tem certeza que deseja excluir esta antena?',
                     html: 'Não será possível recuperar.',
@@ -111,13 +100,48 @@
                     cancelButtonColor: '#3085d6'
                 });
 
-                if (result.isConfirmed) {
-                    form.action = btn_delete.dataset.action;
-                    form.querySelector('input[name="id_antena"]').value = btn_delete.dataset.idantena;
-                    form.submit();
+                if (!result.isConfirmed) {
+                    return;
                 }
+
+                form.action = btn.dataset.action;
+                form.querySelector('input[name="id_antena"]').value = btn.dataset.idantena;
+                form.submit();
             }
+
+            if(!btn.matches('.swal2-confirm')) {
+                if (btn.matches('.btn-mapa')) {
+                    form.target = '_blank';
+                }
+
+                form.action = btn.dataset.action;
+                form.querySelector('input[name="id_antena"]').value = btn.dataset.idantena;
+                form.submit();
+            }
+
+            if(!btn.matches('.btn-mapa, .btn-excluir')) {
+                showLoading()
+            }
+
         });
+
+        document.addEventListener('submit', (e) => {
+            const form = e.target.closest('form');
+            if (!form) return;
+
+            showLoading()
+        });
+
+        function showLoading() {
+            return Swal.fire({
+                title: 'Aguarde...',
+                text: 'Processando sua solicitação',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading()
+                }
+            });
+        }
     </script>
     {% if flash_success is defined and flash_success is not empty %}
     <script>

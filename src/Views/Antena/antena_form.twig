@@ -20,7 +20,7 @@
 
             <div class="d-flex gap-2">
                 {% if antena.id_antena %}
-                    <a href="#" class="btn btn-outline-info btn-ver"
+                    <a href="#" class="btn btn-outline-info btn-loading"
                        data-action="{{ BASE_URL }}/antena/ver" data-idantena="{{ antena.id_antena }}">
                         <i class="bi bi-pencil-square"></i> Ver
                     </a>
@@ -34,7 +34,7 @@
                         <i class="bi bi-eye"></i> Excluir
                     </a>
                 {% endif %}
-                <a href="{{ BASE_URL }}/antena" class="btn btn-secondary">
+                <a href="{{ BASE_URL }}/antena" class="btn btn-secondary btn-loading">
                     <i class="bi bi-arrow-left"></i> Voltar
                 </a>
             </div>
@@ -203,7 +203,7 @@
 
             {# AÇÕES #}
             <div class="d-flex justify-content-end gap-2">
-                <a href="{{ BASE_URL }}/antena" class="btn btn-light">Cancelar</a>
+                <a href="{{ BASE_URL }}/antena" class="btn btn-light btn-loading">Cancelar</a>
                 <button type="submit" class="btn btn-primary">
                     <i class="bi bi-check2-circle"></i> {{ antena.id_antena ? 'Salvar Alterações' : 'Cadastrar' }}
                 </button>

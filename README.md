@@ -178,3 +178,23 @@ FIM 28/10/2025 16:26 MS
 			=>> atualizado Dockerfile
 		>> implementando métodos
 		>> refatorando apls para utilizar hashid
+	=> Implementando csrf token
+		>> apls form
+		>> apls list e ver com exclusão post
+	=> Implementando sweetalert exclusão
+		>> wget https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js -O public/assets/js/sweetalert2.all.min.js
+	=> Criando tag
+		=> git tag -a v1.0.0-stable -m "checkpoint: versão estável antes do login"
+	=> Criando branch
+		=> git checkout -b feature/login
+	=> Analisando código
+		=> composer insights
+		=> ajustando sugestões
+	=> Implementando loading com sweetalert
+		=> loadind ao clicar acoes escolhidas
+	=> Ajuste ambiente 	
+		=> identificado lentidao testando sweetalert loading
+		=> cache twig
+		=> ajustado docker-compose.yml
+		=> refatorado src / config.php
+	=> Implementado limpar filtro

@@ -8,7 +8,15 @@ services:
       - "9091:80"
     volumes:
       - .:/var/www/html
-    command: /bin/bash -c "chmod -R 777 /var/www/html/public/uploads && apache2-foreground"
+      - twig_cache:/var/www/html/var/cache/twig
+    command: >
+      bash -lc "
+        mkdir -p /var/www/html/var/cache/twig /var/www/html/public/uploads &&
+        chown -R www-data:www-data /var/www/html/var /var/www/html/public/uploads &&
+        chmod -R 775 /var/www/html/var /var/www/html/public/uploads &&
+        a2enmod rewrite &&
+        apache2-foreground
+      "
     networks:
       - infranetwork
 
@@ -33,3 +41,6 @@ services:
 networks:
   infranetwork:
     external: true
+
+volumes:
+  twig_cache:
