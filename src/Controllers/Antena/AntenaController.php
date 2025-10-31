@@ -22,6 +22,8 @@ $pdo = db();
 $ext_allowed = ['jpg','png'];
 //total ufs maior incidencia
 $rank = 5;
+//mostrar rank aberto
+$show_rank = isset($_GET['rank']) ? 'show' : 'hide';
 //registros por página
 $per_page = 10;
 
@@ -29,6 +31,7 @@ try {
     $action = preg_match(allowed(), $uri_rota, $match) ? $match[0] : '';
 
     echo match ($action) {
+//      #atualizar
         'atualizar' => (function () use ($pdo, $id_antena, $per_page, $rank, $ext_allowed) {
 
             if($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -144,6 +147,7 @@ try {
                 'redir_msg'     => 'editar',
             ]);
         })(),
+//      #cadastrar
         'cadastrar' => (function () {
             $old = [];
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -158,6 +162,7 @@ try {
                     'ufs'           => getUfOrdenado(),
                 ]);
         })(),
+//      #editar
         'editar' => (function () use ($pdo, $id_antena, $per_page, $rank) {
             $old = [];
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -205,6 +210,7 @@ try {
             ]);
 
         })(),
+//      #excluir
         'excluir' => (function () use ($pdo, $id_antena, $rank, $per_page) {
 
             if($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -288,7 +294,8 @@ try {
 
 
         })(),
-        'listar' => (function () use ($pdo, $rank, $per_page) {
+//      #listar
+        'listar' => (function () use ($pdo, $rank, $show_rank, $per_page) {
 
             $params = getParametroConsulta($pdo, $per_page);
 
@@ -296,6 +303,7 @@ try {
                 'titulo'        => 'Lista de Antenas',
                 'principal_url' => 'home',
                 'csrf'          => getCsrfToken(),
+                'show_rank'     => $show_rank,
                 'ranking_ufs'  => getAntenaRankingUf($pdo, $rank),
                 'antenas'  => getAntenaList($pdo, $params['options']),
                 'page'     => $params['page'],
@@ -305,6 +313,7 @@ try {
                 'uf'       => $params['uf'],
             ]);
         })(),
+//      #mapa
         'mapa' => (function () use ($pdo, $id_antena, $per_page, $rank) {
             if($id_antena === '') {
                 $id_antena = $_POST['id_antena'] ?? '';
@@ -337,6 +346,7 @@ try {
                 'antena'        => getAntenaFindId($pdo, $id_antena),
             ]);
         })(),
+//      #salvar
         'salvar' => (function () use($pdo, $ext_allowed) {
 
             if($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -410,6 +420,7 @@ try {
                 'redir_msg'     => 'cadastrar',
             ]);
         })(),
+//      #ver
         'ver' => (function () use ($pdo, $id_antena, $per_page, $rank) {
             if($id_antena === '') {
                 $id_antena = $_POST['id_antena'] ?? '';

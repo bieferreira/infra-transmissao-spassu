@@ -43,7 +43,7 @@
                 </button>
             </div>
 
-            <div id="rankingUfs" class="collapse show">
+            <div id="rankingUfs" class="collapse {{ show_rank }}">
                 <ul class="list-group list-group-flush">
                     {% if ranking_ufs is empty %}
                         <li class="list-group-item text-muted">Sem dados para exibir.</li>
@@ -152,14 +152,14 @@
 
                         {# Botão primeiro #}
                         <li class="page-item {{ page == 1 ? 'disabled' : '' }}">
-                            <a class="page-link" href="?page=1{% if q %}&q={{ q }}{% endif %}{% if uf %}&uf={{ uf }}{% endif %}" aria-label="Primeiro">
+                            <a class="page-link" href="?page=1{% if q %}&q={{ q }}{% endif %}{% if uf %}&uf={{ uf }}{% endif %}{% if show_rank  == 'show' %}&rank{% endif %}" aria-label="Primeiro">
                                 <span aria-hidden="true">&lt;&lt;</span>
                             </a>
                         </li>
 
                         {# Botão anterior #}
                         <li class="page-item {{ page == 1 ? 'disabled' : '' }}">
-                            <a class="page-link" href="?page={{ page - 1 }}{% if q %}&q={{ q }}{% endif %}{% if uf %}&uf={{ uf }}{% endif %}" aria-label="Anterior">
+                            <a class="page-link" href="?page={{ page - 1 }}{% if q %}&q={{ q }}{% endif %}{% if uf %}&uf={{ uf }}{% endif %}{% if show_rank  == 'show' %}&rank{% endif %}" aria-label="Anterior">
                                 <span aria-hidden="true">&lt;</span>
                             </a>
                         </li>
@@ -167,7 +167,7 @@
                         {# Exibe as páginas dentro da janela calculada #}
                         {% for p in start..end %}
                             <li class="page-item {{ p == page ? 'active' : '' }}">
-                                <a class="page-link" href="?page={{ p }}{% if q %}&q={{ q }}{% endif %}{% if uf %}&uf={{ uf }}{% endif %}">
+                                <a class="page-link" href="?page={{ p }}{% if q %}&q={{ q }}{% endif %}{% if uf %}&uf={{ uf }}{% endif %}{% if show_rank  == 'show' %}&rank{% endif %}">
                                     {{ p }}
                                 </a>
                             </li>
@@ -175,14 +175,14 @@
 
                         {# Botão próximo #}
                         <li class="page-item {{ page == pages ? 'disabled' : '' }}">
-                            <a class="page-link" href="?page={{ page + 1 }}{% if q %}&q={{ q }}{% endif %}{% if uf %}&uf={{ uf }}{% endif %}" aria-label="Próximo">
+                            <a class="page-link" href="?page={{ page + 1 }}{% if q %}&q={{ q }}{% endif %}{% if uf %}&uf={{ uf }}{% endif %}{% if show_rank  == 'show' %}&rank{% endif %}" aria-label="Próximo">
                                 <span aria-hidden="true">&gt;</span>
                             </a>
                         </li>
 
                         {# Botão último #}
                         <li class="page-item {{ page == pages ? 'disabled' : '' }}">
-                            <a class="page-link" href="?page={{ pages }}{% if q %}&q={{ q }}{% endif %}{% if uf %}&uf={{ uf }}{% endif %}" aria-label="Próximo">
+                            <a class="page-link" href="?page={{ pages }}{% if q %}&q={{ q }}{% endif %}{% if uf %}&uf={{ uf }}{% endif %}{% if show_rank  == 'show' %}&rank{% endif %}" aria-label="Próximo">
                                 <span aria-hidden="true">&gt;&gt;</span>
                             </a>
                         </li>

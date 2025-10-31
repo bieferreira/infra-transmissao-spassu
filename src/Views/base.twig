@@ -75,13 +75,11 @@
             form.target = '_self';
 
             const CLICKABLE = [
-                // '.btn-ver',
                 '.btn-mapa',
-                // '.btn-editar',
                 '.btn-excluir',
-                // '.btn-voltar',
                 '.swal2-confirm',
                 '.btn-loading',
+                '.page-link',
             ].join(',');
 
             const btn = e.target.closest(CLICKABLE);
@@ -134,11 +132,11 @@
 
         function showLoading() {
             return Swal.fire({
-                title: 'Aguarde...',
-                text: 'Processando sua solicitação',
                 allowOutsideClick: false,
                 didOpen: () => {
-                    Swal.showLoading()
+                    Swal.showLoading();
+                    const popup = Swal.getPopup();
+                    popup.style.backgroundColor = 'transparent';
                 }
             });
         }
