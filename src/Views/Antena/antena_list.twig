@@ -80,7 +80,7 @@
                 <button type="submit" class="btn btn-outline-success w-50 flex-fill">
                     <i class="bi bi-search"></i> Filtrar
                 </button>
-                <button type="button" class="btn btn-outline-secondary w-50 flex-fill btn-loading" data-action="{{ BASE_URL }}/antena" data-idantena="">
+                <button type="button" class="btn btn-outline-secondary w-50 flex-fill btn-loading" data-action="{{ BASE_URL }}/antena" data-ref="">
                     <i class="bi bi-search"></i> Limpar
                 </button>
             </div>
@@ -119,10 +119,10 @@
                             <td>{{ a.altura|number_format(2, ',', '.') }}</td>
                             <td>{{ a.data_implantacao ? a.data_implantacao | date("d/m/Y") : '' }}</td>
                             <td class="text-center td-actions">
-                                <a href="#" class="btn btn-sm btn-outline-info btn-loading ms-2" data-action="{{ BASE_URL }}/antena/ver" data-idantena="{{ a.id_antena }}">Ver</a>
-                                <a href="#" class="btn btn-sm btn-outline-primary btn-mapa ms-2" data-action="{{ BASE_URL }}/antena/mapa" data-idantena="{{ a.id_antena }}">Mapa</a>
-                                <a href="#" class="btn btn-sm btn-outline-warning btn-loading ms-2" data-action="{{ BASE_URL }}/antena/editar" data-idantena="{{ a.id_antena }}">Editar</a>
-                                <a href="#" class="btn btn-sm btn-outline-danger btn-excluir ms-2" data-action="{{ BASE_URL }}/antena/excluir" data-idantena="{{ a.id_antena }}">Excluir</a>
+                                <a href="#" class="btn btn-sm btn-outline-info btn-loading ms-2" data-action="{{ BASE_URL }}/antena/ver" data-ref="{{ a.id_antena }}">Ver</a>
+                                <a href="#" class="btn btn-sm btn-outline-primary btn-mapa ms-2" data-action="{{ BASE_URL }}/antena/mapa" data-ref="{{ a.id_antena }}">Mapa</a>
+                                <a href="#" class="btn btn-sm btn-outline-warning btn-loading ms-2" data-action="{{ BASE_URL }}/antena/editar" data-ref="{{ a.id_antena }}">Editar</a>
+                                <a href="#" class="btn btn-sm btn-outline-danger btn-excluir ms-2" data-action="{{ BASE_URL }}/antena/excluir" data-ref="{{ a.id_antena }}">Excluir</a>
                             </td>
                         </tr>
                     {% endfor %}

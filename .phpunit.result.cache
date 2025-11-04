@@ -1,1 +1,1 @@
-{"version":2,"defects":{"ExampleTest::testSomaBasica":7},"times":{"ExampleTest::testSomaBasica":0.001}}
+{"version":2,"defects":{"ExampleTest::testSomaBasica":7},"times":{"ExampleTest::testSomaBasica":0,"AntenasSeederTest::testGerarLatitudeRetornaValorDentroDoIntervalo":0.021,"AntenasSeederTest::testGerarLongitudeRetornaValorDentroDoIntervalo":0.02}}

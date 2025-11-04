@@ -320,6 +320,7 @@ function antena_create(PDO $pdo, array $dados): string
     return '';
 }
 
+// #excluir
 function antena_delete(PDO $pdo, string $id): bool
 {
     $id = (int)getHashidDecode($id);

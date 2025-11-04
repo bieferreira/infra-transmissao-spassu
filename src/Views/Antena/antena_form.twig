@@ -21,16 +21,16 @@
             <div class="d-flex gap-2">
                 {% if antena.id_antena %}
                     <a href="#" class="btn btn-outline-info btn-loading"
-                       data-action="{{ BASE_URL }}/antena/ver" data-idantena="{{ antena.id_antena }}">
+                       data-action="{{ BASE_URL }}/antena/ver" data-ref="{{ antena.id_antena }}">
                         <i class="bi bi-pencil-square"></i> Ver
                     </a>
                     <a href="#"
                        class="btn btn-outline-primary btn-mapa"
-                       data-action="{{ BASE_URL }}/antena/mapa" data-idantena="{{ antena.id_antena }}">
+                       data-action="{{ BASE_URL }}/antena/mapa" data-ref="{{ antena.id_antena }}">
                         <i class="bi bi-trash"></i> Mapa
                     </a>
                     <a href="#" class="btn btn-outline-danger btn-excluir"
-                       data-action="{{ BASE_URL }}/antena/excluir" data-idantena="{{ antena.id_antena }}">
+                       data-action="{{ BASE_URL }}/antena/excluir" data-ref="{{ antena.id_antena }}">
                         <i class="bi bi-eye"></i> Excluir
                     </a>
                 {% endif %}
